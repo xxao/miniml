@@ -49,7 +49,8 @@ plot_regression(model, X_train, Y_train)
 
 - [Python 3.7+](https://www.python.org)
 - [Numpy](https://pypi.org/project/numpy/)
-- [ [sklearn](https://scikit-learn.org/stable/) ] Optional, used for example datasets.
+- [ [sklearn](https://scikit-learn.org/stable/) ] Optional, used to load example datasets.
+- [ [matplotlib](https://pypi.org/project/matplotlib/) ] Optional, used to display examples.
 
 
 ## Installation
