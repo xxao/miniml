@@ -167,9 +167,9 @@ class Layer(object):
         self._dW = (1 / m) * np.dot(dZ, self._X.T) + (lamb / m) * self._W
         self._db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
         
-        dZ = np.dot(self._W.T, dZ)
+        dA = np.dot(self._W.T, dZ)
         
-        return dZ
+        return dA
     
     
     def update(self, optimizer=GD, **optimizer_params):
