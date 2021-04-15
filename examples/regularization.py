@@ -8,8 +8,6 @@ from utils import *
 data = scipy.io.loadmat('../datasets/data.mat')
 X_train = data['X'].T
 Y_train = data['y'].T
-X_test = data['Xval'].T
-Y_test = data['yval'].T
 
 # init params
 rate = 0.3
