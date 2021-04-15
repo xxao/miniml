@@ -83,6 +83,22 @@ class Model(object):
             layer.initialize(optimizer)
     
     
+    def predict(self, X):
+        """
+        Performs prediction through model layers.
+        
+        Args:
+            X:
+                Input data.
+        
+        Returns:
+            Y_hat:
+                Predicted output.
+        """
+        
+        return self.forward(X)
+    
+    
     def forward(self, A, keep=1):
         """
         Performs forward propagation through all layers.

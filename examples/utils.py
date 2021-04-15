@@ -14,7 +14,7 @@ def predict(model, X, Y, threshold=0.5):
     C = Y.shape[0]
     
     # predict by model
-    A = model.forward(X)
+    A = model.predict(X)
     
     # convert to 0/1 predictions
     p = A > threshold
@@ -77,7 +77,7 @@ def plot_boundaries(model, X, Y, threshold=0.5):
     X_fake = np.stack((xx.flatten(), yy.flatten()), axis=1)
     
     # predict by model
-    A = model.forward(X_fake.T)
+    A = model.predict(X_fake.T)
     
     # convert predictions
     if C == 1:
@@ -128,7 +128,7 @@ def plot_regression(model, X, Y):
     plt.ylabel('y')
     
     # predict by model
-    A = model.forward(X)
+    A = model.predict(X)
     
     # plot training set
     plt.scatter(X[0], Y[0], s=40, marker='o', cmap="Blue")
