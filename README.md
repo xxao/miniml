@@ -4,9 +4,9 @@ The *MiniML* is a super basic Python library for machine learning for beginners
 (as I am). It is by no means meant as a  stable, production platform, and most
 probably it is not even useful for anyone except me. In fact, it is rather my
 small playground, or a way I am trying to learn this very interesting topic.
-Hopefully some more functionality will come  as I learn more. There are some
-simple [examples](https://github.com/xxao/miniml/tree/master/examples) you can
-check to have some impression what can be done.
+Hopefully additional functionality will come as I learn more. Please check
+simple [examples](https://github.com/xxao/miniml/tree/master/examples) to have
+better impression what can be done.
 
 ### Example: Non-linear regression
 
@@ -41,10 +41,9 @@ epochs = 1000
 optimizer = miniml.Optimizer(cost='mse', epochs=epochs, init_seed=48, store=10, verbose=200)
 costs = optimizer.train_adam(model, X_train, Y_train, rate)
 
-# predict by model
+# plot results
 plot_costs(costs, rate, epochs)
 plot_regression(model, X_train, Y_train)
-
 ```
 
 ## Requirements
