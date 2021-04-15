@@ -1,10 +1,12 @@
 # MiniML
 
-The *MiniML* is a super basic Python library for machine learning for beginners (as I am). It is by no means meant as a
-stable, production platform, and most probably it is not even useful for anyone except me. In fact, it is rather my
-small playground, or a way I am trying to learn this very interesting topic. Hopefully some more functionality will come
-as I learn more. There are some simple [examples](https://github.com/xxao/miniml/tree/master/examples) you can check to
-have some impression what can be done.
+The *MiniML* is a super basic Python library for machine learning for beginners
+(as I am). It is by no means meant as a  stable, production platform, and most
+probably it is not even useful for anyone except me. In fact, it is rather my
+small playground, or a way I am trying to learn this very interesting topic.
+Hopefully some more functionality will come  as I learn more. There are some
+simple [examples](https://github.com/xxao/miniml/tree/master/examples) you can
+check to have some impression what can be done.
 
 ### Example: Non-linear regression
 
@@ -55,8 +57,9 @@ plot_regression(model, X_train, Y_train)
 
 ## Installation
 
-The *MiniML* library is fully implemented in Python. No additional compiler is necessary. After downloading the source
-code just run the following command from the *miniml* folder:
+The *MiniML* library is fully implemented in Python. No additional compiler is
+necessary. After downloading and unzipping the source code just run following
+command from the unpacked folder:
 
 ```$ python setup.py install```
 
