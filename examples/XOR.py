@@ -1,8 +1,8 @@
 import miniml
 from utils import *
 
-# Test case from
-# https://www.kdnuggets.com/2019/08/numpy-neural-networks-computational-graphs.html
+# Adapted from:
+# https://github.com/RafayAK/NothingButNumPy/blob/master/Understanding_and_Creating_NNs/3_layer_toy_network_XOR.ipynb
 
 # init data
 X = np.array([
@@ -32,12 +32,16 @@ model.add(5, 'sigmoid', 'xavier')
 model.add(3, 'sigmoid', 'xavier')
 model.add(1, 'sigmoid', 'xavier')
 
-# train the model
+# train model
 # note that original implementation is without averaging across examples in LinearLayer.backward(...)
-optimizer = miniml.Optimizer(cost='mse', epochs=epochs, init_seed=48)
+optimizer = miniml.Optimizer(
+    cost = 'mse',
+    epochs = epochs,
+    init_seed = 48)
+
 costs = optimizer.train_gd(model, X_train, Y_train, rate)
 
-# predict by model
+# plot results
 predict(model, X_train, Y_train)
 plot_costs(costs, rate, epochs)
 plot_boundaries(model, X_train, Y_train)

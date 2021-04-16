@@ -1,7 +1,10 @@
 import miniml
 from utils import *
 
-# make data
+# Adapted from:
+# http://saitcelebi.com/tut/output/part2.html
+
+# init data
 X = np.array([
     [-0.1, 1.4],
     [-0.5, 0.2],
@@ -26,11 +29,11 @@ X = np.array([
 
 y = np.array([0, 0, 1, 0, 2, 1, 1, 1, 1, 0, 0, 2, 2, 2, 1, 0, 1, 2, 2, 2])
 
-# convert results to one-hot
+# convert to one-hot
 Y, cats = miniml.to_categorical(y)
 C = len(cats)
 
-# transpose the data to correct shape for NN (n, m)
+# transpose to correct shape for NN (n, m)
 X_train = X.T
 Y_train = Y.T
 
@@ -43,10 +46,17 @@ model = miniml.Model(X_train.shape[0])
 # model.add(32, 'relu', 'he')
 model.add(C, 'softmax', 'plain')
 
-optimizer = miniml.Optimizer(cost='ce', epochs=epochs, init_seed=48, store=1, verbose=10)
+# train model
+optimizer = miniml.Optimizer(
+    cost = 'ce',
+    epochs = epochs,
+    init_seed = 48,
+    store = 1,
+    verbose = 10)
+
 costs = optimizer.train_gd(model, X_train, Y_train, rate)
 
-# predict by model
+# plot results
 predict(model, X_train, Y_train)
 plot_costs(costs, rate, epochs)
 plot_boundaries(model, X_train, Y_train)

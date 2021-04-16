@@ -2,7 +2,7 @@ import sklearn.datasets
 import miniml
 from utils import *
 
-# Test case from DeepLearning.AI
+# Adapted from DeepLearning.AI
 
 np.random.seed(3)
 X_train, Y_train = sklearn.datasets.make_moons(n_samples=300, noise=.2)
@@ -35,7 +35,7 @@ optimizer = miniml.Optimizer(
 costs = optimizer.train_adam(model, X_train, Y_train, rate=rate, beta1=0.9, beta2=0.999)
 # costs = optimizer.train_adagrad(model, X_train, Y_train, rate=rate)
 
-# predict by model
+# plot results
 predict(model, X_train, Y_train)
 plot_costs(costs, rate, epochs)
 plot_boundaries(model, X_train, Y_train)

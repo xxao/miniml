@@ -2,7 +2,7 @@ import sklearn.datasets
 import miniml
 from utils import *
 
-# Test case from DeepLearning.AI
+# Adapted from DeepLearning.AI
 
 # load data
 np.random.seed(1)
@@ -29,7 +29,7 @@ optimizer = miniml.Optimizer(
 
 costs = optimizer.train_gd(model, X_train, Y_train, rate=rate)
 
-# predict by model
+# plot results
 predict(model, X_train, Y_train)
 plot_costs(costs, rate, epochs)
 plot_boundaries(model, X_train, Y_train)

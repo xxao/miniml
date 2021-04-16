@@ -2,7 +2,7 @@ import scipy.io
 import miniml
 from utils import *
 
-# Test case from DeepLearning.AI
+# Adapted from DeepLearning.AI
 
 # load data
 data = scipy.io.loadmat('../datasets/data.mat')
@@ -35,7 +35,7 @@ costs = optimizer.train_gd(model, X_train, Y_train,
     keep = keep,
     lamb = lamb)
 
-# predict by model
+# plot results
 predict(model, X_train, Y_train)
 plot_costs(costs, rate, epochs)
 plot_boundaries(model, X_train, Y_train)

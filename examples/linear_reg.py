@@ -1,6 +1,7 @@
 import miniml
 from utils import *
 
+# Adapted from:
 # https://lucidar.me/en/neural-networks/simplest-neural-netwok-ever/
 
 # init data
@@ -19,10 +20,15 @@ epochs = 2000
 model = miniml.Model(X_train.shape[0])
 model.add(1, 'linear', 'plain')
 
-# train the model
-optimizer = miniml.Optimizer(cost='mse', epochs=epochs, init_seed=48, verbose=500)
+# train model
+optimizer = miniml.Optimizer(
+    cost = 'mse',
+    epochs = epochs,
+    init_seed = 48,
+    verbose = 500)
+
 costs = optimizer.train_gd(model, X_train, Y_train, rate)
 
-# predict by model
+# plot results
 plot_costs(costs, rate, epochs)
 plot_regression(model, X_train, Y_train)

@@ -23,10 +23,16 @@ model.add(64, 'relu', 'he')
 model.add(32, 'relu', 'he')
 model.add(1, 'linear', 'plain')
 
-# train the model
-optimizer = miniml.Optimizer(cost='mse', epochs=epochs, init_seed=48, store=10, verbose=200)
+# train model
+optimizer = miniml.Optimizer(
+    cost = 'mse',
+    epochs = epochs,
+    init_seed = 48,
+    store = 10,
+    verbose = 200)
+
 costs = optimizer.train_adam(model, X_train, Y_train, rate)
 
-# predict by model
+# plot results
 plot_costs(costs, rate, epochs)
 plot_regression(model, X_train, Y_train)
