@@ -5,8 +5,8 @@ version = (0, 1, 0)
 
 # load modules
 from . enums import *
-from . costs import *
-from . activations import *
-from . layers import *
-from . model import *
-from . optimize import *
+from . costs import mean_squared_error, binary_cross_entropy, cross_entropy
+from . activations import Activation, Linear, Sigmoid, ReLU, Tanh, Softmax
+from . dense import Dense
+from . model import Model
+from . optimize import Optimizer

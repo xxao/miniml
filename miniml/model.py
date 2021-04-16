@@ -2,7 +2,7 @@
 
 import numpy as np
 from . enums import *
-from . layers import Layer
+from . dense import Dense
 
 
 class Model(object):
@@ -66,7 +66,7 @@ class Model(object):
         """
         
         last = len(self._layers[-1]) if self._layers else self._inputs
-        layer = Layer(last, size, activation, init_method)
+        layer = Dense(last, size, activation, init_method)
         self._layers.append(layer)
     
     

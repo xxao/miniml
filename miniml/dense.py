@@ -5,13 +5,13 @@ from . enums import *
 from . activations import *
 
 
-class Layer(object):
-    """Represents a single linear layer of neural network."""
+class Dense(object):
+    """Represents a fully connected linear layer of neural network."""
     
     
     def __init__(self, n_in, n_out, activation=RELU, w_init=HE):
         """
-        Initializes a new instance of LinearLayer.
+        Initializes a new instance of Dense.
         
         Args:
             n_in: int
