@@ -13,3 +13,4 @@ from . pool import Pool, MaxPool, AvgPool
 from . flatten import Flatten
 from . model import Model
 from . optimize import Optimizer
+from . utils import shuffle_data, to_categorical, make_mini_batches
