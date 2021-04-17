@@ -10,5 +10,6 @@ from . activations import Activation, Linear, Sigmoid, ReLU, Tanh, Softmax
 from . layer import Layer
 from . dense import Dense
 from . pool import Pool, MaxPool, AvgPool
+from . flatten import Flatten
 from . model import Model
 from . optimize import Optimizer
