@@ -15,7 +15,7 @@ class Pool(Layer):
         
         Args:
             size: int or (int, int)
-                Size of the kernel as (h, w) or single integer fi square.
+                Size of the kernel as (h, w) or single integer if squared.
             
             stride: int
                 Single step kernel shift.
