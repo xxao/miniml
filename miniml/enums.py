@@ -23,3 +23,7 @@ MOMENTUM = 'momentum'
 RMSPROP = 'rmsprop'
 ADAGRAD = 'adagrad'
 ADAM = 'adam'
+
+# define pooling
+MAX = 'max'
+AVG = 'avg'
