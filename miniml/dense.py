@@ -3,9 +3,10 @@
 import numpy as np
 from . enums import *
 from . activations import *
+from . layer import Layer
 
 
-class Dense(object):
+class Dense(Layer):
     """Represents a fully connected linear layer of neural network."""
     
     
@@ -44,12 +45,6 @@ class Dense(object):
         return "Linear(%d, %d, %s) | %s" % (self._n_in, self._n_out, self._w_init, self._activation)
     
     
-    def __repr__(self):
-        """Gets debug representation."""
-        
-        return self.__str__()
-    
-    
     def __len__(self):
         """Gets number of neurons within the layer."""
         
@@ -70,7 +65,7 @@ class Dense(object):
         return self._b
     
     
-    def initialize(self, optimizer=GD):
+    def initialize(self, optimizer=GD, **kwargs):
         """
         Resets all internal caches and re-initializes params.
         
@@ -107,7 +102,7 @@ class Dense(object):
         self._init_params(optimizer)
     
     
-    def forward(self, X, keep=1):
+    def forward(self, X, keep=1, **kwargs):
         """
         Performs forward propagation using activations from previous layer.
         
@@ -140,7 +135,7 @@ class Dense(object):
         return self._A
     
     
-    def backward(self, dA, lamb=0):
+    def backward(self, dA, lamb=0, **kwargs):
         """
         Performs backward propagation using upstream gradients.
         

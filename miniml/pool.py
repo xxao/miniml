@@ -2,9 +2,10 @@
 
 import numpy as np
 from . enums import *
+from . layer import Layer
 
 
-class Pool(object):
+class Pool(Layer):
     """Represents a pooling layer of neural network."""
     
     
@@ -36,13 +37,7 @@ class Pool(object):
         return "%sPool(%dx%d)" % (self._mode.title(), self._size[0], self._size[1])
     
     
-    def __repr__(self):
-        """Gets debug representation."""
-        
-        return self.__str__()
-    
-    
-    def forward(self, X):
+    def forward(self, X, **kwargs):
         """
         Performs forward propagation using activations from previous layer.
         
@@ -90,7 +85,7 @@ class Pool(object):
         return output
     
     
-    def backward(self, dA):
+    def backward(self, dA, **kwargs):
         """
         Performs backward propagation using upstream gradients.
         
