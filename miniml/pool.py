@@ -53,21 +53,22 @@ class Pool(Layer):
         self._X = X
         
         # get dimensions
-        m, n_H, n_W, n_C = X.shape
+        m, h_in, w_in, c_in = X.shape
         f_h, f_w = self._size
-        n_H = int(1 + (n_H - f_h) / self._stride)
-        n_W = int(1 + (n_W - f_w) / self._stride)
+        h_out = int(1 + (h_in - f_h) / self._stride)
+        w_out = int(1 + (w_in - f_w) / self._stride)
+        c_out = c_in
         
         # init output
-        output = np.zeros((m, n_H, n_W, n_C))
+        output = np.zeros((m, h_out, w_out, c_out))
         
         # loop over vertical axis
-        for h in range(n_H):
+        for h in range(h_out):
             h_start = h * self._stride
             h_end = h_start + f_h
             
             # loop over horizontal axis
-            for w in range(n_W):
+            for w in range(w_out):
                 w_start = w * self._stride
                 w_end = w_start + f_w
                 
@@ -100,7 +101,7 @@ class Pool(Layer):
         
         # get dimensions
         f_h, f_w = self._size
-        m, n_H, n_W, n_C = dA.shape
+        m, h_out, w_out, c_out = dA.shape
         
         # init output
         output = np.zeros(self._X.shape)
@@ -109,17 +110,17 @@ class Pool(Layer):
         for i in range(m):
             
             # loop over vertical axis
-            for h in range(n_H):
+            for h in range(h_out):
                 h_start = h * self._stride
                 h_end = h_start + f_h
                 
                 # loop over horizontal axis
-                for w in range(n_W):
+                for w in range(w_out):
                     w_start = w * self._stride
                     w_end = w_start + f_w
                     
                     # loop over channels
-                    for c in range(n_C):
+                    for c in range(c_out):
                         da = dA[i, h, w, c]
                         
                         # max pooling
