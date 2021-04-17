@@ -76,7 +76,6 @@ class Dense(Layer):
         
         # main input and output
         self._X = None
-        self._Z = None
         self._A = None
         
         # params to learn
@@ -122,8 +121,8 @@ class Dense(Layer):
         self._mask = None
         
         # forward propagation
-        self._Z = np.dot(self._W, self._X) + self._b
-        self._A = self._activation.forward(self._Z)
+        Z = np.dot(self._W, self._X) + self._b
+        self._A = self._activation.forward(Z)
         
         # apply dropout
         if self._keep < 1:
