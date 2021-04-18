@@ -27,7 +27,7 @@ X_train = X.reshape((1, X.shape[0]))
 Y_train = Y.reshape((1, Y.shape[0]))
 
 # create model
-model = miniml.Model(X_train.shape[0])
+model = miniml.Model()
 model.add(1, 'linear', 'plain')
 model.add(64, 'relu', 'he')
 model.add(32, 'relu', 'he')
