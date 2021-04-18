@@ -9,7 +9,7 @@ class Pool(Layer):
     """Represents a pooling layer of neural network."""
     
     
-    def __init__(self, size, stride, mode='max'):
+    def __init__(self, size, stride, mode=MAX):
         """
         Initializes a new instance of Pool.
         

@@ -53,12 +53,6 @@ class Dense(Layer):
         return "Dense(%d | %s | %s)" % (self._nodes, self._w_init, self._activation)
     
     
-    def __len__(self):
-        """Gets number of neurons within the layer."""
-        
-        return self._nodes
-    
-    
     @property
     def W(self):
         """Gets current weights."""
