@@ -27,3 +27,7 @@ ADAM = 'adam'
 # define pooling
 MAX = 'max'
 AVG = 'avg'
+
+# define padding
+VALID = 'valid'
+SAME = 'same'
