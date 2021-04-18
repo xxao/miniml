@@ -61,10 +61,10 @@ class Optimizer(object):
                 Network model to train.
             
             X:
-                Training data set input.
+                Training dataset input.
             
             Y:
-                Training data set output.
+                Training dataset output.
             
             keep: float
                 Dropout keep probability (0-1).
@@ -87,12 +87,13 @@ class Optimizer(object):
         costs = []
         batch_seed = self._batch_seed or 0
         
+        # reset model params and cashes
+        model.reset()
+        
         # set layers init seed
         if self._init_seed:
             np.random.seed(self._init_seed)
-        
-        # init layers params
-        model.initialize(optimizer)
+            model.forward(X[:, :1])
         
         # train model
         for epoch in range(self._epochs):
@@ -147,10 +148,10 @@ class Optimizer(object):
                 Network model to train.
             
             X:
-                Training data set input.
+                Training dataset input.
             
             Y:
-                Training data set output.
+                Training dataset output.
             
             rate: float
                 Learning rate.
@@ -185,10 +186,10 @@ class Optimizer(object):
                 Network model to train.
             
             X:
-                Training data set input.
+                Training dataset input.
             
             Y:
-                Training data set output.
+                Training dataset output.
             
             rate: float
                 Learning rate.
@@ -227,10 +228,10 @@ class Optimizer(object):
                 Network model to train.
             
             X:
-                Training data set input.
+                Training dataset input.
             
             Y:
-                Training data set output.
+                Training dataset output.
             
             rate: float
                 Learning rate.
@@ -269,10 +270,10 @@ class Optimizer(object):
                 Network model to train.
             
             X:
-                Training data set input.
+                Training dataset input.
             
             Y:
-                Training data set output.
+                Training dataset output.
             
             rate: float
                 Learning rate.
@@ -315,10 +316,10 @@ class Optimizer(object):
                 Network model to train.
             
             X:
-                Training data set input.
+                Training dataset input.
             
             Y:
-                Training data set output.
+                Training dataset output.
             
             rate: float
                 Learning rate.
@@ -373,4 +374,3 @@ class Optimizer(object):
             return cross_entropy
         
         raise ValueError("Unknown cost function specified! -> '%s" % name)
-

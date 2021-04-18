@@ -27,7 +27,7 @@ rate = 1
 epochs = 20000
 
 # create model
-model = miniml.Model(X_train.shape[0])
+model = miniml.Model()
 model.add(5, 'sigmoid', 'xavier')
 model.add(3, 'sigmoid', 'xavier')
 model.add(1, 'sigmoid', 'xavier')

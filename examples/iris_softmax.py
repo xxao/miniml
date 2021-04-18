@@ -24,7 +24,7 @@ epochs = 5000
 batch_size = 40
 
 # create model
-model = miniml.Model(X_train.shape[0])
+model = miniml.Model()
 model.add(5, 'relu', 'he')
 model.add(3, 'softmax', 'plain')
 

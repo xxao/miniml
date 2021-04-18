@@ -37,6 +37,12 @@ class Pool(Layer):
         return "%sPool(%dx%d)" % (self._mode.title(), self._size[0], self._size[1])
     
     
+    def reset(self):
+        """Resets params and caches in all layers."""
+        
+        self._X = None
+    
+    
     def forward(self, X, **kwargs):
         """
         Performs forward propagation using activations from previous layer.

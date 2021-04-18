@@ -9,16 +9,9 @@ class Model(object):
     """Represents a neural network model."""
     
     
-    def __init__(self, inputs):
-        """
-        Initializes a new instance of Model.
+    def __init__(self):
+        """Initializes a new instance of Model."""
         
-        Args:
-            inputs: int
-                Number of input features.
-        """
-        
-        self._inputs = int(inputs)
         self._layers = []
     
     
@@ -48,12 +41,12 @@ class Model(object):
         return tuple(self._layers)
     
     
-    def add(self, size, activation=RELU, init_method=HE):
+    def add(self, nodes, activation=RELU, init_method=HE):
         """
-        Creates and adds additional layer to the model.
+        Creates and adds additional dense layer to the model.
         
         Args:
-            size: int
+            nodes: int
                 Number of output connections (neurons).
             
             activation: str
@@ -65,22 +58,15 @@ class Model(object):
                 or 'he'.
         """
         
-        last = len(self._layers[-1]) if self._layers else self._inputs
-        layer = Dense(last, size, activation, init_method)
+        layer = Dense(nodes, activation, init_method)
         self._layers.append(layer)
     
     
-    def initialize(self, optimizer=GD):
-        """
-        Resets internal caches and re-initializes params in all layers.
-        
-        Args:
-            optimizer: str
-                Optimizer name.
-        """
+    def reset(self):
+        """Resets params and caches in all layers."""
         
         for layer in self._layers:
-            layer.initialize(optimizer)
+            layer.reset()
     
     
     def predict(self, X):

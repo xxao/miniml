@@ -17,7 +17,7 @@ rate = 0.01
 epochs = 1000
 
 # create model
-model = miniml.Model(X_train.shape[0])
+model = miniml.Model()
 model.add(1, 'linear', 'plain')
 model.add(64, 'relu', 'he')
 model.add(32, 'relu', 'he')

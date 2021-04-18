@@ -11,8 +11,8 @@ class Layer(object):
         return self.__str__()
     
     
-    def initialize(self, **kwargs):
-        """Resets all internal caches and re-initializes params."""
+    def reset(self):
+        """Resets params and caches in all layers."""
         
         pass
     

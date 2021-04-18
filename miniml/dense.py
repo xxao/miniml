@@ -10,15 +10,12 @@ class Dense(Layer):
     """Represents a fully connected linear layer of neural network."""
     
     
-    def __init__(self, n_in, n_out, activation=RELU, w_init=HE):
+    def __init__(self, nodes, activation=RELU, w_init=HE):
         """
         Initializes a new instance of Dense.
         
         Args:
-            n_in: int
-                Number of input connections (features).
-            
-            n_out: int
+            nodes: int
                 Number of output connections (neurons).
             
             activation: str
@@ -28,27 +25,38 @@ class Dense(Layer):
                 W initialization method name such as 'plain', 'xavier' or 'he'.
         """
         
-        self._n_in = int(n_in)
-        self._n_out = int(n_out)
+        self._nodes = int(nodes)
         self._w_init = w_init
-        
-        # set activation function
         self._activation = self._init_activation(activation)
         
-        # initializes params and caches
-        self.initialize()
+        self._X = None
+        self._A = None
+        
+        self._W = None
+        self._b = None
+        self._dW = None
+        self._db = None
+        
+        self._keep = 1
+        self._mask = None
+        
+        self._t = 0
+        self._vdW = None
+        self._vdb = None
+        self._sdW = None
+        self._sdb = None
     
     
     def __str__(self):
         """Gets string representation."""
         
-        return "Linear(%d, %d, %s) | %s" % (self._n_in, self._n_out, self._w_init, self._activation)
+        return "Dense(%d | %s | %s)" % (self._nodes, self._w_init, self._activation)
     
     
     def __len__(self):
         """Gets number of neurons within the layer."""
         
-        return self._n_out
+        return self._nodes
     
     
     @property
@@ -65,40 +73,25 @@ class Dense(Layer):
         return self._b
     
     
-    def initialize(self, optimizer=GD, **kwargs):
-        """
-        Resets all internal caches and re-initializes params.
+    def reset(self):
+        """Resets params and caches in all layers."""
         
-        Args:
-            optimizer: str
-                Optimizer name.
-        """
-        
-        # main input and output
         self._X = None
         self._A = None
         
-        # params to learn
         self._W = None
         self._b = None
-        
-        # params gradients
         self._dW = None
         self._db = None
         
-        # backdrop
         self._keep = 1
         self._mask = None
         
-        # momentum and adam
         self._t = 0
         self._vdW = None
         self._vdb = None
         self._sdW = None
         self._sdb = None
-        
-        # init params
-        self._init_params(optimizer)
     
     
     def forward(self, X, keep=1, **kwargs):
@@ -119,6 +112,10 @@ class Dense(Layer):
         self._X = X
         self._keep = keep
         self._mask = None
+        
+        # init params
+        if self._W is None:
+            self._init_params(self._X.shape[0], self._nodes)
         
         # forward propagation
         Z = np.dot(self._W, self._X) + self._b
@@ -180,30 +177,30 @@ class Dense(Layer):
         
         # update by gradient descent
         if optimizer == GD:
-            self.update_gd(**optimizer_params)
+            self._update_gd(**optimizer_params)
         
         # update by gradient descent with Momentum.
         elif optimizer == MOMENTUM:
-            self.update_momentum(**optimizer_params)
+            self._update_momentum(**optimizer_params)
         
         # update by gradient descent with RMSprop.
         elif optimizer == RMSPROP:
-            self.update_rmsprop(**optimizer_params)
+            self._update_rmsprop(**optimizer_params)
         
         # update by gradient descent with Adam.
         elif optimizer == ADAM:
-            self.update_adam(**optimizer_params)
+            self._update_adam(**optimizer_params)
         
         # update by gradient descent with Adagrad.
         elif optimizer == ADAGRAD:
-            self.update_adagrad(**optimizer_params)
+            self._update_adagrad(**optimizer_params)
         
         # unknown optimizer
         else:
             raise ValueError("Unknown optimizer specified! -> '%s" % optimizer)
     
     
-    def update_gd(self, rate=0.1):
+    def _update_gd(self, rate=0.1):
         """
         Updates params by gradient descent.
         
@@ -216,7 +213,7 @@ class Dense(Layer):
         self._b = self._b - rate * self._db
     
     
-    def update_momentum(self, rate=0.1, beta=0.9):
+    def _update_momentum(self, rate=0.1, beta=0.9):
         """
         Updates params by gradient descent with Momentum.
         
@@ -228,6 +225,10 @@ class Dense(Layer):
                 Momentum parameter.
         """
         
+        if self._vdW is None:
+            self._vdW = np.zeros(self._dW.shape)
+            self._vdb = np.zeros(self._db.shape)
+        
         self._vdW = beta * self._vdW + (1 - beta) * self._dW
         self._vdb = beta * self._vdb + (1 - beta) * self._db
         
@@ -235,7 +236,7 @@ class Dense(Layer):
         self._b = self._b - rate * self._vdb
     
     
-    def update_rmsprop(self, rate=0.1, beta=0.9, epsilon=1e-8):
+    def _update_rmsprop(self, rate=0.1, beta=0.9, epsilon=1e-8):
         """
         Updates params by gradient descent with RMSprop.
         
@@ -250,6 +251,10 @@ class Dense(Layer):
                 Zero division corrector.
         """
         
+        if self._sdW is None:
+            self._sdW = np.zeros(self._dW.shape)
+            self._sdb = np.zeros(self._db.shape)
+        
         self._sdW = beta * self._sdW + (1 - beta) * self._dW**2
         self._sdb = beta * self._sdb + (1 - beta) * self._db**2
         
@@ -257,7 +262,7 @@ class Dense(Layer):
         self._b = self._b - rate * self._db / np.sqrt(self._sdb + epsilon)
     
     
-    def update_adam(self, rate=0.1, beta1=0.9, beta2=0.999, epsilon=1e-8):
+    def _update_adam(self, rate=0.1, beta1=0.9, beta2=0.999, epsilon=1e-8):
         """
         Updates params by gradient descent with Adam.
         
@@ -277,6 +282,12 @@ class Dense(Layer):
         
         self._t += 1
         
+        if self._vdW is None:
+            self._vdW = np.zeros(self._dW.shape)
+            self._vdb = np.zeros(self._db.shape)
+            self._sdW = np.zeros(self._dW.shape)
+            self._sdb = np.zeros(self._db.shape)
+        
         self._vdW = beta1 * self._vdW + (1 - beta1) * self._dW
         self._vdb = beta1 * self._vdb + (1 - beta1) * self._db
         
@@ -293,7 +304,7 @@ class Dense(Layer):
         self._b = self._b - rate * v_corr_db / (s_corr_db**0.5 + epsilon)
     
     
-    def update_adagrad(self, rate=0.1, epsilon=1e-8):
+    def _update_adagrad(self, rate=0.1, epsilon=1e-8):
         """
         Updates params by gradient descent with Adagrad.
         
@@ -304,6 +315,10 @@ class Dense(Layer):
             epsilon: float
                 Zero division corrector.
         """
+        
+        if self._sdW is None:
+            self._sdW = np.zeros(self._dW.shape)
+            self._sdb = np.zeros(self._db.shape)
         
         self._sdW = self._sdW + self._dW**2
         self._sdb = self._sdb + self._db**2
@@ -336,31 +351,21 @@ class Dense(Layer):
         raise ValueError("Unknown activation function specified! -> '%s" % activation)
     
     
-    def _init_params(self, optimizer):
+    def _init_params(self, n_in, n_out):
         """Initializes params."""
+        
+        # init bias
+        self._b = np.zeros((n_out, 1))
         
         # init weights
         if self._w_init == PLAIN:
-            self._W = np.random.randn(self._n_out, self._n_in) * 0.01
+            self._W = np.random.randn(n_out, n_in) * 0.01
         
         elif self._w_init == XAVIER:
-            self._W = np.random.randn(self._n_out, self._n_in) * np.sqrt(1/self._n_in)
+            self._W = np.random.randn(n_out, n_in) * np.sqrt(1 / n_in)
         
         elif self._w_init == HE:
-            self._W = np.random.randn(self._n_out, self._n_in) * np.sqrt(2/self._n_in)
+            self._W = np.random.randn(n_out, n_in) * np.sqrt(2 / n_in)
         
         else:
             raise ValueError("Unknown initialization method specified! -> '%s" % self._w_init)
-        
-        # init bias
-        self._b = np.zeros((self._n_out, 1))
-        
-        # init squared
-        if optimizer in (RMSPROP, ADAM, ADAGRAD):
-            self._sdW = np.zeros((self._n_out, self._n_in))
-            self._sdb = np.zeros((self._n_out, 1))
-        
-        # init velocity
-        if optimizer in (MOMENTUM, ADAM):
-            self._vdW = np.zeros((self._n_out, self._n_in))
-            self._vdb = np.zeros((self._n_out, 1))

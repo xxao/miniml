@@ -15,7 +15,7 @@ epochs = 10000
 batch_size = 64
 
 # init model
-model = miniml.Model(X_train.shape[0])
+model = miniml.Model()
 model.add(5, 'relu', 'he')
 model.add(2, 'relu', 'he')
 model.add(1, 'sigmoid', 'he')

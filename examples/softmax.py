@@ -42,7 +42,7 @@ rate = 2
 epochs = 40
 
 # create model
-model = miniml.Model(X_train.shape[0])
+model = miniml.Model()
 # model.add(32, 'relu', 'he')
 model.add(C, 'softmax', 'plain')
 

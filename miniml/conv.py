@@ -18,7 +18,7 @@ class Conv2D(Layer):
                 Number of filters.
             
             size: int or (int, int)
-                Size of the kernel as (n_h, n_w,) or single integer if squared.
+                Size of the kernel as (n_h, n_w) or single integer if squared.
             
             stride: int
                 Single step kernel shift.
@@ -34,6 +34,7 @@ class Conv2D(Layer):
         self._pad = self._init_padding(pad, *self._size)
         
         self._X = None
+        
         self._W = None
         self._b = None
         self._dW = None
@@ -43,7 +44,7 @@ class Conv2D(Layer):
     def __str__(self):
         """Gets string representation."""
         
-        return "Conv2D"
+        return "Conv2D(%dx%dx%d)" % (self._size[0], self._size[0], self._depth)
     
     
     @property
@@ -58,6 +59,17 @@ class Conv2D(Layer):
         """Gets current biases."""
         
         return self._b
+    
+    
+    def reset(self):
+        """Resets params and caches in all layers."""
+        
+        self._X = None
+        
+        self._W = None
+        self._b = None
+        self._dW = None
+        self._db = None
     
     
     def forward(self, X, **kwargs):
@@ -180,6 +192,6 @@ class Conv2D(Layer):
             return pad, pad
         
         elif pad == SAME:
-            return (f_h - 1) / 2, (f_w - 1) / 2
+            return (f_h - 1) // 2, (f_w - 1) // 2
         
         return 0, 0
