@@ -61,7 +61,7 @@ class Optimizer(object):
         return self._cache
     
     
-    def train(self, model, X, Y, keep=1, lamb=0, **optimizer_params):
+    def train(self, model, X, Y, lamb=0, **optimizer_params):
         """
         Trains model by data using specified optimizer.
         
@@ -74,9 +74,6 @@ class Optimizer(object):
             
             Y: np.ndarray
                 Training dataset output.
-            
-            keep: float
-                Dropout keep probability (0-1).
             
             lamb: float
                 L2 regularization lambda parameter.
@@ -101,7 +98,7 @@ class Optimizer(object):
         # set layers init seed
         if self._init_seed:
             np.random.seed(self._init_seed)
-            model.forward(X[:1])
+            model.predict(X[:1])
         
         # train model
         for epoch in range(self._epochs):
@@ -121,7 +118,7 @@ class Optimizer(object):
             for X_train, Y_train in batches:
                 
                 # forward propagation
-                Y_hat = model.forward(X_train, keep=keep)
+                Y_hat = model.forward(X_train)
                 
                 # compute cost
                 cost, dA = self._calc_cost(model, Y_train, Y_hat, lamb=lamb)
@@ -145,6 +142,21 @@ class Optimizer(object):
                 print("Cost for epoch #%d: %.6f" % (epoch, cost_avg))
         
         return costs
+    
+    
+    def update(self, model, **optimizer_params):
+        """
+        Updates params for all layers.
+        
+        Args:
+            model: miniml.Model
+                Model to update.
+            
+            optimizer_params: {str: any}
+                Optimizer update parameters.
+        """
+        
+        pass
     
     
     def _calc_cost(self, model, Y, Y_hat, lamb=0):
@@ -182,7 +194,7 @@ class GradDescent(Optimizer):
     """Gradient descent optimizer."""
     
     
-    def train(self, model, X, Y, rate=0.1, keep=1, lamb=0):
+    def train(self, model, X, Y, rate=0.1, lamb=0):
         """
         Trains model by data using gradient descent.
         
@@ -199,9 +211,6 @@ class GradDescent(Optimizer):
             rate: float
                 Learning rate.
             
-            keep: float
-                Dropout keep probability (0-1).
-            
             lamb: float
                 L2 regularization lambda parameter.
         
@@ -214,7 +223,6 @@ class GradDescent(Optimizer):
             model = model,
             X = X,
             Y = Y,
-            keep = keep,
             lamb = lamb,
             rate = rate)
     
@@ -234,7 +242,7 @@ class GradDescent(Optimizer):
         # update model
         for i, layer in enumerate(model.layers):
             
-            # skip if not optimizable
+            # skip if not to optimize
             if not layer.OPTIMIZE:
                 continue
             
@@ -250,7 +258,7 @@ class Momentum(Optimizer):
     """Gradient descent optimizer with Momentum."""
     
     
-    def train(self, model, X, Y, rate=0.1, keep=1, lamb=0, beta=0.9):
+    def train(self, model, X, Y, rate=0.1, lamb=0, beta=0.9):
         """
         Trains model by data using gradient descent with Momentum.
         
@@ -267,9 +275,6 @@ class Momentum(Optimizer):
             rate: float
                 Learning rate.
             
-            keep: float
-                Dropout keep probability (0-1).
-            
             lamb: float
                 L2 regularization lambda parameter.
             
@@ -285,7 +290,6 @@ class Momentum(Optimizer):
             model = model,
             X = X,
             Y = Y,
-            keep = keep,
             lamb = lamb,
             rate = rate,
             beta = beta)
@@ -309,7 +313,7 @@ class Momentum(Optimizer):
         # update model
         for i, layer in enumerate(model.layers):
             
-            # skip if not optimizable
+            # skip if not to optimize
             if not layer.OPTIMIZE:
                 continue
             
@@ -341,7 +345,7 @@ class RMSprop(Optimizer):
     """Gradient descent optimizer with RMSprop."""
     
     
-    def train(self, model, X, Y, rate=0.1, keep=1, lamb=0, beta=0.9):
+    def train(self, model, X, Y, rate=0.1, lamb=0, beta=0.9):
         """
         Trains model by data using gradient descent with RMSprop.
         
@@ -358,9 +362,6 @@ class RMSprop(Optimizer):
             rate: float
                 Learning rate.
             
-            keep: float
-                Dropout keep probability (0-1).
-            
             lamb: float
                 L2 regularization lambda parameter.
             
@@ -376,7 +377,6 @@ class RMSprop(Optimizer):
             model = model,
             X = X,
             Y = Y,
-            keep = keep,
             lamb = lamb,
             rate = rate,
             beta = beta)
@@ -403,7 +403,7 @@ class RMSprop(Optimizer):
         # update model
         for i, layer in enumerate(model.layers):
             
-            # skip if not optimizable
+            # skip if not to optimize
             if not layer.OPTIMIZE:
                 continue
             
@@ -435,7 +435,7 @@ class Adam(Optimizer):
     """Gradient descent optimizer with Adam."""
     
     
-    def train(self, model, X, Y, rate=0.1, keep=1, lamb=0, beta1=0.9, beta2=0.999):
+    def train(self, model, X, Y, rate=0.1, lamb=0, beta1=0.9, beta2=0.999):
         """
         Trains model by data using gradient descent with Adam.
         
@@ -451,9 +451,6 @@ class Adam(Optimizer):
             
             rate: float
                 Learning rate.
-            
-            keep: float
-                Dropout keep probability (0-1).
             
             lamb: float
                 L2 regularization lambda parameter.
@@ -473,7 +470,6 @@ class Adam(Optimizer):
             model = model,
             X = X,
             Y = Y,
-            keep = keep,
             lamb = lamb,
             rate = rate,
             beta1 = beta1,
@@ -507,7 +503,7 @@ class Adam(Optimizer):
         # update model
         for i, layer in enumerate(model.layers):
             
-            # skip if not optimizable
+            # skip if not to optimize
             if not layer.OPTIMIZE:
                 continue
             
@@ -557,7 +553,7 @@ class Adagrad(Optimizer):
     """Gradient descent optimizer with Adagrad."""
     
     
-    def train(self, model, X, Y, rate=0.1, keep=1, lamb=0):
+    def train(self, model, X, Y, rate=0.1, lamb=0):
         """
         Trains model by data using gradient descent with Adagrad.
         
@@ -574,9 +570,6 @@ class Adagrad(Optimizer):
             rate: float
                 Learning rate.
             
-            keep: float
-                Dropout keep probability (0-1).
-            
             lamb: float
                 L2 regularization lambda parameter.
         
@@ -589,7 +582,6 @@ class Adagrad(Optimizer):
             model = model,
             X = X,
             Y = Y,
-            keep = keep,
             lamb = lamb,
             rate = rate)
     
@@ -612,7 +604,7 @@ class Adagrad(Optimizer):
         # update model
         for i, layer in enumerate(model.layers):
             
-            # skip if not optimizable
+            # skip if not to optimize
             if not layer.OPTIMIZE:
                 continue
             

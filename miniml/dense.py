@@ -39,9 +39,6 @@ class Dense(Layer):
         self._b = None
         self._dW = None
         self._db = None
-        
-        self._keep = 1
-        self._mask = None
     
     
     def __str__(self):
@@ -88,9 +85,6 @@ class Dense(Layer):
         self._b = None
         self._dW = None
         self._db = None
-        
-        self._keep = 1
-        self._mask = None
     
     
     def forward(self, X, keep=1, **kwargs):
@@ -110,8 +104,6 @@ class Dense(Layer):
         """
         
         self._X = X
-        self._keep = keep
-        self._mask = None
         
         # init params
         if self._W is None:
@@ -124,13 +116,6 @@ class Dense(Layer):
         self._A = Z
         if self._activation is not None:
             self._A = self._activation.forward(Z)
-        
-        # apply dropout
-        if self._keep < 1:
-            self._mask = np.random.rand(self._A.shape[1], self._A.shape[0]).T
-            self._mask = (self._mask < self._keep).astype(int)
-            self._A = np.multiply(self._A, self._mask)
-            self._A = self._A / self._keep
         
         return self._A
     
@@ -152,11 +137,6 @@ class Dense(Layer):
         """
         
         m = self._X.shape[0]
-        
-        # apply dropout
-        if self._keep < 1:
-            dA = np.multiply(dA, self._mask)
-            dA = dA / self._keep
         
         # apply activation
         dZ = dA

@@ -12,13 +12,15 @@ Y = data['y']
 # init params
 rate = 0.3
 epochs = 30000
-lamb = 0.7
+keep = 0.86
 
 # init model
 model = miniml.Model()
-model.add(20, 'relu', 'xavier')
-model.add(3, 'relu', 'xavier')
-model.add(1, 'sigmoid', 'xavier')
+model.dense(20, 'relu', 'xavier')
+model.dropout(keep)
+model.dense(3, 'relu', 'xavier')
+model.dropout(keep)
+model.dense(1, 'sigmoid', 'xavier')
 
 # train model
 optimizer = miniml.GradDescent(
@@ -29,7 +31,7 @@ optimizer = miniml.GradDescent(
     store = 1000,
     verbose = 10000)
 
-costs = optimizer.train(model, X, Y, rate, lamb=lamb)
+costs = optimizer.train(model, X, Y, rate)
 
 # plot results
 predict(model, X, Y)

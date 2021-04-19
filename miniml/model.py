@@ -6,6 +6,7 @@ from . conv import Conv2D
 from . pool import Pool
 from . flatten import Flatten
 from . dense import Dense
+from . dropout import Dropout
 
 
 class Model(object):
@@ -112,6 +113,19 @@ class Model(object):
         self._layers.append(layer)
     
     
+    def dropout(self, keep):
+        """
+        Appends new dropout layer.
+        
+        Args:
+            keep: float
+                Keep probability as %/100.
+        """
+        
+        layer = Dropout(keep)
+        self._layers.append(layer)
+    
+    
     def dense(self, nodes, activation=RELU, init_method=HE):
         """
         Appends new fully-connected (dense) layer.
@@ -140,12 +154,12 @@ class Model(object):
             layer.reset()
     
     
-    def predict(self, X):
+    def predict(self, A):
         """
         Performs prediction through model layers.
         
         Args:
-            X: np.ndarray
+            A: np.ndarray
                 Input data of shape (m,...).
         
         Returns:
@@ -153,33 +167,30 @@ class Model(object):
                 Predicted output with shape (m,?).
         """
         
-        return self.forward(X)
+        for layer in self._layers:
+            if not isinstance(layer, Dropout):
+                A = layer.forward(A)
+        
+        return A
     
     
-    def forward(self, A, keep=1):
+    def forward(self, A):
         """
         Performs forward propagation through all layers.
         
         Args:
             A: np.ndarray
                 Input data of shape (m,...).
-            
-            keep: float
-                Dropout keep probability (0-1).
         
         Returns:
             Y_hat:
                 Activations from the output layer with shape (m,?).
         """
         
-        # process hidden layers
-        for layer in self._layers[:-1]:
-            A = layer.forward(A, keep=keep)
+        for layer in self._layers:
+            A = layer.forward(A)
         
-        # process output layer
-        Y_hat = self._layers[-1].forward(A)
-        
-        return Y_hat
+        return A
     
     
     def backward(self, dA, lamb=0):
@@ -194,9 +205,5 @@ class Model(object):
                 Lambda parameter for L2 regularization.
         """
         
-        # process output layer
-        dA = self._layers[-1].backward(dA, lamb=lamb)
-        
-        # process hidden layers
-        for layer in reversed(self._layers[:-1]):
+        for layer in reversed(self._layers):
             dA = layer.backward(dA, lamb=lamb)

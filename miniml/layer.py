@@ -2,7 +2,7 @@
 
 
 class Layer(object):
-    """Represents a base class for various types of neural network layer."""
+    """Represents a base class for various types of neural network layers."""
     
     OPTIMIZE = False
     

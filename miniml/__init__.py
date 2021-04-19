@@ -11,6 +11,7 @@ from . layer import Layer
 from . dense import Dense
 from . pool import Pool, MaxPool, AvgPool
 from . flatten import Flatten
+from . dropout import Dropout
 from . conv import Conv2D
 from . model import Model
 from . optimize import Optimizer, GradDescent, Momentum, RMSprop, Adam, Adagrad
