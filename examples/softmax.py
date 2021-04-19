@@ -33,10 +33,6 @@ y = np.array([0, 0, 1, 0, 2, 1, 1, 1, 1, 0, 0, 2, 2, 2, 1, 0, 1, 2, 2, 2])
 Y, cats = miniml.to_categorical(y)
 C = len(cats)
 
-# transpose to correct shape for NN (n, m)
-X_train = X.T
-Y_train = Y.T
-
 # init params
 rate = 2
 epochs = 40
@@ -54,9 +50,9 @@ optimizer = miniml.Optimizer(
     store = 1,
     verbose = 10)
 
-costs = optimizer.train_gd(model, X_train, Y_train, rate)
+costs = optimizer.train_gd(model, X, Y, rate)
 
 # plot results
-predict(model, X_train, Y_train)
+predict(model, X, Y)
 plot_costs(costs, rate, epochs)
-plot_boundaries(model, X_train, Y_train)
+plot_boundaries(model, X, Y)

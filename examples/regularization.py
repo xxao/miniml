@@ -6,8 +6,8 @@ from utils import *
 
 # load data
 data = scipy.io.loadmat('../datasets/data.mat')
-X_train = data['X'].T
-Y_train = data['y'].T
+X = data['X']
+Y = data['y']
 
 # init params
 rate = 0.3
@@ -30,12 +30,12 @@ optimizer = miniml.Optimizer(
     store = 1000,
     verbose = 10000)
 
-costs = optimizer.train_gd(model, X_train, Y_train,
+costs = optimizer.train_gd(model, X, Y,
     rate = rate,
     keep = keep,
     lamb = lamb)
 
 # plot results
-predict(model, X_train, Y_train)
+predict(model, X, Y)
 plot_costs(costs, rate, epochs)
-plot_boundaries(model, X_train, Y_train)
+plot_boundaries(model, X, Y)

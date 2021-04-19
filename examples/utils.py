@@ -10,8 +10,8 @@ def predict(model, X, Y, threshold=0.5):
     """Predict on test data."""
     
     # get shape
-    m = X.shape[1]
-    C = Y.shape[0]
+    m = X.shape[0]
+    C = Y.shape[1]
     
     # predict by model
     A = model.predict(X)
@@ -54,10 +54,6 @@ def plot_boundaries(model, X, Y, threshold=0.5):
     
     NX = 1000
     NY = 1000
-    
-    # transpose
-    X = X.T
-    Y = Y.T
     C = Y.shape[1]
     
     # get range
@@ -77,7 +73,7 @@ def plot_boundaries(model, X, Y, threshold=0.5):
     X_fake = np.stack((xx.flatten(), yy.flatten()), axis=1)
     
     # predict by model
-    A = model.predict(X_fake.T)
+    A = model.predict(X_fake)
     
     # convert predictions
     if C == 1:
@@ -85,7 +81,6 @@ def plot_boundaries(model, X, Y, threshold=0.5):
         A = A.reshape(NX, NY)
         Y = np.squeeze(Y)
     else:
-        A = A.T
         A = A.argmax(axis=1)
         A = A.reshape(NX, NY)
         Y = Y.argmax(axis=1)
@@ -131,10 +126,10 @@ def plot_regression(model, X, Y):
     A = model.predict(X)
     
     # plot training set
-    plt.scatter(X[0], Y[0], s=40, marker='o', cmap="Blue")
+    plt.scatter(X[::, 0], Y[::, 0], s=40, marker='o', cmap="Blue")
     
     # plot predicted data
-    plt.plot(X[0], A[0], 'Red', linewidth=2)
+    plt.plot(X[::, 0], A[::, 0], 'Red', linewidth=2)
     
     # show plot
     plt.show()

@@ -24,7 +24,7 @@ def mean_squared_error(Y, Y_hat):
             Gradient.
     """
     
-    m = Y.shape[1]
+    m = Y.shape[0]
     
     # calc cost
     cost = (1 / (2 * m)) * np.sum(np.square(Y - Y_hat))
@@ -60,7 +60,7 @@ def binary_cross_entropy(Y, Y_hat, epsilon=1e-8):
             Gradient.
     """
     
-    m = Y.shape[1]
+    m = Y.shape[0]
     
     # make data safe
     Y_hat = np.clip(Y_hat, a_min=epsilon, a_max=(1 - epsilon))
@@ -99,7 +99,7 @@ def cross_entropy(Y, Y_hat, epsilon=1e-8):
             Gradient.
     """
     
-    m = Y.shape[1]
+    m = Y.shape[0]
     
     # make data safe
     Y_hat = np.clip(Y_hat, a_min=epsilon, a_max=(1 - epsilon))

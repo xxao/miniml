@@ -14,10 +14,6 @@ C = len(cats)
 # shuffle data
 X, Y = miniml.shuffle_data(X, Y, seed=48)
 
-# transpose to correct shape for NN (n, m)
-X_train = X.T
-Y_train = Y.T
-
 # init params
 rate = 0.01
 epochs = 5000
@@ -35,7 +31,7 @@ optimizer = miniml.Optimizer(
     init_seed = 48,
     verbose = 1000)
 
-costs = optimizer.train_adam(model, X_train, Y_train, rate)
+costs = optimizer.train_adam(model, X, Y, rate)
 
 # plot results
 plot_costs(costs, rate, epochs)

@@ -141,12 +141,12 @@ class Model(object):
         Performs prediction through model layers.
         
         Args:
-            X:
-                Input data.
+            X: np.ndarray
+                Input data of shape (m,...).
         
         Returns:
             Y_hat:
-                Predicted output.
+                Predicted output with shape (m,?).
         """
         
         return self.forward(X)
@@ -157,15 +157,15 @@ class Model(object):
         Performs forward propagation through all layers.
         
         Args:
-            A:
-                Input data.
+            A: np.ndarray
+                Input data of shape (m,...).
             
             keep: float
                 Dropout keep probability (0-1).
         
         Returns:
             Y_hat:
-                Activations from the output layer.
+                Activations from the output layer with shape (m,?).
         """
         
         # process hidden layers
@@ -183,8 +183,8 @@ class Model(object):
         Performs backward propagation through all layers.
         
         Args:
-            dA:
-                Gradients of cost.
+            dA: np.ndarray
+                Gradients of cost with shape (m, ?).
             
             lamb: float
                 Lambda parameter for L2 regularization.

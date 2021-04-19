@@ -105,25 +105,25 @@ class Softmax(Activation):
         """Performs forward propagation through activation function."""
         
         eZ = np.exp(Z - np.max(Z))
-        return eZ / eZ.sum(axis=0, keepdims=True)
+        return eZ / eZ.sum(axis=1, keepdims=True)
     
     
     def backward(self, A, dA):
         """Performs backward propagation through activation function."""
         
-        C, m = A.shape
-        dZ = np.zeros((C, m))
+        m, C = A.shape
+        dZ = np.zeros((m, C))
         ones = np.ones((1, C))
         ident = np.identity(C)
         
         for j in range(m):
             
-            a = A[::, j].reshape(C, 1)
-            da = dA[::, j].reshape(C, 1)
+            a = A[j].reshape(C, 1)
+            da = dA[j].reshape(C, 1)
             
             t = np.matmul(a, ones)
             mat = t * (ident - t.T)
             dz = np.matmul(mat, da)
-            dZ[::, j] = dz[::, 0]
+            dZ[j] = dz.T[0]
         
         return dZ

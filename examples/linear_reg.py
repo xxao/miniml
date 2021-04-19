@@ -9,8 +9,8 @@ np.random.seed(3)
 X = np.linspace(-10, 10, num=500)
 Y = 0.6 * X + 2 + np.random.normal(size=500)
 
-X_train = X.reshape((1, X.shape[0]))
-Y_train = Y.reshape((1, Y.shape[0]))
+X = X.reshape((len(X), 1))
+Y = Y.reshape((len(Y), 1))
 
 # init params
 rate = 1
@@ -27,8 +27,8 @@ optimizer = miniml.Optimizer(
     init_seed = 48,
     verbose = 500)
 
-costs = optimizer.train_gd(model, X_train, Y_train, rate)
+costs = optimizer.train_gd(model, X, Y, rate)
 
 # plot results
 plot_costs(costs, rate, epochs)
-plot_regression(model, X_train, Y_train)
+plot_regression(model, X, Y)

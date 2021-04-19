@@ -6,9 +6,8 @@ from utils import *
 
 # load data
 np.random.seed(1)
-X_train, Y_train = sklearn.datasets.make_circles(n_samples=300, noise=.05)
-X_train = X_train.T
-Y_train = Y_train.reshape((1, Y_train.shape[0]))
+X, Y = sklearn.datasets.make_circles(n_samples=300, noise=.05)
+Y = Y.reshape((len(Y), 1))
 
 # init params
 rate = 0.01
@@ -27,9 +26,9 @@ optimizer = miniml.Optimizer(
     init_seed = 3,
     store = 1000)
 
-costs = optimizer.train_gd(model, X_train, Y_train, rate=rate)
+costs = optimizer.train_gd(model, X, Y, rate=rate)
 
 # plot results
-predict(model, X_train, Y_train)
+predict(model, X, Y)
 plot_costs(costs, rate, epochs)
-plot_boundaries(model, X_train, Y_train)
+plot_boundaries(model, X, Y)

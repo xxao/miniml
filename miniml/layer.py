@@ -24,6 +24,7 @@ class Layer(object):
         Args:
             X: np.ndarray
                 Input data/activations from previous (left) layer.
+                The expected shape is (m, ...).
         
         Returns:
             Output data/activations.
@@ -39,6 +40,7 @@ class Layer(object):
         Args:
             dA:
                 Gradients from previous (right) layer.
+                The expected shape is (m, ?).
         
         Returns:
             Gradients from this layer.

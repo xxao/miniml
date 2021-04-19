@@ -74,10 +74,10 @@ def make_mini_batches(X, Y, size=64, seed=None):
     
     Args:
         X: np.ndarray
-            Input dataset of shape (n, m).
+            Input dataset of shape (m, ...).
         
         Y: np.ndarray
-            Output dataset of shape (n_y, m).
+            Output dataset of shape (m, ...).
         
         size: int
             Size of a mini-batch. Should be 64, 128, 256 or 512. If set to
@@ -99,25 +99,25 @@ def make_mini_batches(X, Y, size=64, seed=None):
         np.random.seed(seed)
     
     # get batch count
-    m = X.shape[1]
+    m = X.shape[0]
     count = int(math.floor(m / size))
     batches = []
     
     # shuffle data
     permutation = list(np.random.permutation(m))
-    shuffled_X = X[:, permutation]
-    shuffled_Y = Y[:, permutation].reshape((1, m))
+    shuffled_X = X[permutation]
+    shuffled_Y = Y[permutation]
     
     # create full-size batches
     for k in range(0, count):
-        batch_X = shuffled_X[:, k * size: (k + 1) * size]
-        batch_Y = shuffled_Y[:, k * size: (k + 1) * size]
+        batch_X = shuffled_X[k * size: (k + 1) * size]
+        batch_Y = shuffled_Y[k * size: (k + 1) * size]
         batches.append((batch_X, batch_Y))
     
     # create remaining batch
     if m % size != 0:
-        batch_X = shuffled_X[:, count * size: m]
-        batch_Y = shuffled_Y[:, count * size: m]
+        batch_X = shuffled_X[count * size: m]
+        batch_Y = shuffled_Y[count * size: m]
         batches.append((batch_X, batch_Y))
     
     return batches

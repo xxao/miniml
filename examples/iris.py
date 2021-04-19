@@ -17,12 +17,8 @@ Y = iris.target.reshape((150, 1))
 # shuffle data
 X, Y = miniml.shuffle_data(X, Y, seed=48)
 
-# transpose to correct shape for NN (n, m)
-X_train = X.T
-Y_train = Y.T
-
 # make the target label virginica = 1 and the rest 0
-Y_train = (Y_train == 2).astype('int')
+Y = (Y == 2).astype('int')
 
 # init params
 rate = 1
@@ -42,9 +38,9 @@ optimizer = miniml.Optimizer(
     init_seed = 48,
     verbose = 1000)
 
-costs = optimizer.train_gd(model, X_train, Y_train, rate)
+costs = optimizer.train_gd(model, X, Y, rate)
 
 # plot results
-predict(model, X_train, Y_train)
+predict(model, X, Y)
 plot_costs(costs, rate, epochs)
-plot_boundaries(model, X_train, Y_train)
+plot_boundaries(model, X, Y)

@@ -93,7 +93,7 @@ class Optimizer(object):
         # set layers init seed
         if self._init_seed:
             np.random.seed(self._init_seed)
-            model.forward(X[:, :1])
+            model.forward(X[:1])
         
         # train model
         for epoch in range(self._epochs):
@@ -353,7 +353,7 @@ class Optimizer(object):
         
         # apply L2 regularization
         if lamb != 0:
-            m = Y.shape[1]
+            m = Y.shape[0]
             Ws = sum(np.sum(np.square(layer.W)) for layer in model.layers)
             L2_cost = (lamb / (2 * m)) * Ws
             cost += L2_cost

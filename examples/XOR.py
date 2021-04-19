@@ -19,9 +19,6 @@ Y = np.array([
     [0]
 ])
 
-X_train = X.T
-Y_train = Y.T
-
 # init params
 rate = 1
 epochs = 20000
@@ -39,9 +36,9 @@ optimizer = miniml.Optimizer(
     epochs = epochs,
     init_seed = 48)
 
-costs = optimizer.train_gd(model, X_train, Y_train, rate)
+costs = optimizer.train_gd(model, X, Y, rate)
 
 # plot results
-predict(model, X_train, Y_train)
+predict(model, X, Y)
 plot_costs(costs, rate, epochs)
-plot_boundaries(model, X_train, Y_train)
+plot_boundaries(model, X, Y)

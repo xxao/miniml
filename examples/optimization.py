@@ -5,9 +5,8 @@ from utils import *
 # Adapted from DeepLearning.AI
 
 np.random.seed(3)
-X_train, Y_train = sklearn.datasets.make_moons(n_samples=300, noise=.2)
-X_train = X_train.T
-Y_train = Y_train.reshape((1, Y_train.shape[0]))
+X, Y = sklearn.datasets.make_moons(n_samples=300, noise=.2)
+Y = Y.reshape((len(Y), 1))
 
 # init params
 rate = 0.0007
@@ -29,13 +28,13 @@ optimizer = miniml.Optimizer(
     init_seed = 3,
     store = 1000)
 
-# costs = optimizer.train_gd(model, X_train, Y_train, rate=rate)
-# costs = optimizer.train_momentum(model, X_train, Y_train, rate=rate, beta=0.9)
-# costs = optimizer.train_rmsprop(model, X_train, Y_train, rate=rate, beta=0.9)
-costs = optimizer.train_adam(model, X_train, Y_train, rate=rate, beta1=0.9, beta2=0.999)
-# costs = optimizer.train_adagrad(model, X_train, Y_train, rate=rate)
+# costs = optimizer.train_gd(model, X, Y, rate=rate)
+# costs = optimizer.train_momentum(model, X, Y, rate=rate, beta=0.9)
+# costs = optimizer.train_rmsprop(model, X, Y, rate=rate, beta=0.9)
+costs = optimizer.train_adam(model, X, Y, rate=rate, beta1=0.9, beta2=0.999)
+# costs = optimizer.train_adagrad(model, X, Y, rate=rate)
 
 # plot results
-predict(model, X_train, Y_train)
+predict(model, X, Y)
 plot_costs(costs, rate, epochs)
-plot_boundaries(model, X_train, Y_train)
+plot_boundaries(model, X, Y)
