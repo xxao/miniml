@@ -3,10 +3,10 @@
 import numpy as np
 from . enums import *
 from . conv import Conv2D
-from . pool import Pool
-from . flatten import Flatten
 from . dense import Dense
 from . dropout import Dropout
+from . flatten import Flatten
+from . pool import Pool
 
 
 class Model(object):
@@ -37,114 +37,6 @@ class Model(object):
         """Gets all model layers."""
         
         return tuple(self._layers)
-    
-    
-    def add(self, nodes, activation=RELU, init_method=HE):
-        """
-        Creates and adds additional dense layer to the model.
-        
-        Args:
-            nodes: int
-                Number of output connections (neurons).
-            
-            activation: str
-                Activation function name such as 'sigmoid', 'relu', 'tanh'
-                or 'softmax'.
-            
-            init_method: str
-                W parameter initialization method such as 'plain', 'xavier'
-                or 'he'.
-        """
-        
-        layer = Dense(nodes, activation, init_method)
-        self._layers.append(layer)
-    
-    
-    def conv2d(self, depth, ksize, stride, pad=SAME, init_method=HE):
-        """
-        Appends new 2D convolution layer.
-        
-        Args:
-            depth: int
-                Number of filters.
-            
-            ksize: int or (int, int)
-                Size of the kernel as (n_h, n_w) or single integer if squared.
-            
-            stride: int
-                Single step kernel shift.
-            
-            pad: int, (int, int) or str
-                Initial data padding as a specific number or mode such as
-                'valid' or 'same'.
-            
-            init_method: str
-                W parameter initialization method such as 'plain', 'xavier'
-                or 'he'.
-        """
-        
-        layer = Conv2D(depth, ksize, stride, pad, init_method)
-        self._layers.append(layer)
-    
-    
-    def pool(self, ksize, stride, mode=MAX):
-        """
-        Appends new pooling layer.
-        
-        Args:
-            ksize: int or (int, int)
-                Size of the kernel as (h, w) or single integer if squared.
-            
-            stride: int
-                Single step kernel shift.
-            
-            mode: str
-                Pooling modes such as 'max' or 'avg'.
-        """
-        
-        layer = Pool(ksize, stride, mode)
-        self._layers.append(layer)
-    
-    
-    def flatten(self):
-        """Appends new flattening layer."""
-        
-        layer = Flatten()
-        self._layers.append(layer)
-    
-    
-    def dropout(self, keep):
-        """
-        Appends new dropout layer.
-        
-        Args:
-            keep: float
-                Keep probability as %/100.
-        """
-        
-        layer = Dropout(keep)
-        self._layers.append(layer)
-    
-    
-    def dense(self, nodes, activation=RELU, init_method=HE):
-        """
-        Appends new fully-connected (dense) layer.
-        
-        Args:
-            nodes: int
-                Number of output connections (neurons).
-            
-            activation: str
-                Activation function name such as 'sigmoid', 'relu', 'tanh' or
-                'softmax'. If set to None, activation is not applied.
-            
-            init_method: str
-                W parameter initialization method such as 'plain', 'xavier'
-                or 'he'.
-        """
-        
-        layer = Dense(nodes, activation, init_method)
-        self._layers.append(layer)
     
     
     def reset(self):
@@ -207,3 +99,90 @@ class Model(object):
         
         for layer in reversed(self._layers):
             dA = layer.backward(dA, lamb=lamb)
+    
+    
+    def conv2d(self, depth, ksize, stride, pad=SAME, init_method=HE):
+        """
+        Appends new 2D convolution layer.
+        
+        Args:
+            depth: int
+                Number of filters.
+            
+            ksize: int or (int, int)
+                Size of the kernel as (n_h, n_w) or single integer if squared.
+            
+            stride: int
+                Single step kernel shift.
+            
+            pad: int, (int, int) or str
+                Initial data padding as a specific number or mode such as
+                'valid' or 'same'.
+            
+            init_method: str
+                W parameter initialization method such as 'plain', 'xavier'
+                or 'he'.
+        """
+        
+        layer = Conv2D(depth, ksize, stride, pad, init_method)
+        self._layers.append(layer)
+    
+    
+    def dense(self, nodes, activation=RELU, init_method=HE):
+        """
+        Appends new fully-connected (dense) layer.
+        
+        Args:
+            nodes: int
+                Number of output connections (neurons).
+            
+            activation: str
+                Activation function name such as 'sigmoid', 'relu', 'tanh' or
+                'softmax'. If set to None, activation is not applied.
+            
+            init_method: str
+                W parameter initialization method such as 'plain', 'xavier'
+                or 'he'.
+        """
+        
+        layer = Dense(nodes, activation, init_method)
+        self._layers.append(layer)
+    
+    
+    def dropout(self, keep):
+        """
+        Appends new dropout layer.
+        
+        Args:
+            keep: float
+                Keep probability as %/100.
+        """
+        
+        layer = Dropout(keep)
+        self._layers.append(layer)
+    
+    
+    def flatten(self):
+        """Appends new flattening layer."""
+        
+        layer = Flatten()
+        self._layers.append(layer)
+    
+    
+    def pool(self, ksize, stride, mode=MAX):
+        """
+        Appends new pooling layer.
+        
+        Args:
+            ksize: int or (int, int)
+                Size of the kernel as (h, w) or single integer if squared.
+            
+            stride: int
+                Single step kernel shift.
+            
+            mode: str
+                Pooling modes such as 'max' or 'avg'.
+        """
+        
+        layer = Pool(ksize, stride, mode)
+        self._layers.append(layer)

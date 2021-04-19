@@ -16,9 +16,9 @@ lamb = 0.7
 
 # init model
 model = miniml.Model()
-model.add(20, 'relu', 'xavier')
-model.add(3, 'relu', 'xavier')
-model.add(1, 'sigmoid', 'xavier')
+model.dense(20, 'relu', 'xavier')
+model.dense(3, 'relu', 'xavier')
+model.dense(1, 'sigmoid', 'xavier')
 
 # train model
 optimizer = miniml.GradDescent(

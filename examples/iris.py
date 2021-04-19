@@ -26,9 +26,9 @@ epochs = 5000
 
 # create model
 model = miniml.Model()
-model.add(5, 'sigmoid', 'xavier')
-model.add(3, 'sigmoid', 'xavier')
-model.add(1, 'sigmoid', 'xavier')
+model.dense(5, 'sigmoid', 'xavier')
+model.dense(3, 'sigmoid', 'xavier')
+model.dense(1, 'sigmoid', 'xavier')
 
 # train model
 # note that original implementation is without averaging across examples in LinearLayer.backward(...)

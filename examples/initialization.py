@@ -15,9 +15,9 @@ epochs = 15000
 
 # init model
 model = miniml.Model()
-model.add(10, 'relu', 'he')
-model.add(5, 'relu', 'he')
-model.add(1, 'sigmoid', 'he')
+model.dense(10, 'relu', 'he')
+model.dense(5, 'relu', 'he')
+model.dense(1, 'sigmoid', 'he')
 
 # train model
 optimizer = miniml.GradDescent(

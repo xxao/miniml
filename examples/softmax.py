@@ -39,8 +39,8 @@ epochs = 40
 
 # create model
 model = miniml.Model()
-# model.add(32, 'relu', 'he')
-model.add(C, 'softmax', 'plain')
+# model.dense(32, 'relu', 'he')
+model.dense(C, 'softmax', 'plain')
 
 # train model
 optimizer = miniml.GradDescent(

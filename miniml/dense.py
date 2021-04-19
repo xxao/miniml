@@ -164,9 +164,6 @@ class Dense(Layer):
                 Biases.
         """
         
-        assert(W.shape == self._W.shape)
-        assert(b.shape == self._b.shape)
-        
         self._W = W
         self._b = b
     

@@ -18,7 +18,7 @@ epochs = 2000
 
 # create model
 model = miniml.Model()
-model.add(1, 'linear', 'plain')
+model.dense(1, 'linear', 'plain')
 
 # train model
 optimizer = miniml.GradDescent(

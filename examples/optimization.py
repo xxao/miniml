@@ -15,9 +15,9 @@ batch_size = 64
 
 # init model
 model = miniml.Model()
-model.add(5, 'relu', 'he')
-model.add(2, 'relu', 'he')
-model.add(1, 'sigmoid', 'he')
+model.dense(5, 'relu', 'he')
+model.dense(2, 'relu', 'he')
+model.dense(1, 'sigmoid', 'he')
 
 # train model (try different optimizers)
 optimizer = miniml.Adam(

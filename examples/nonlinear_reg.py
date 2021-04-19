@@ -18,10 +18,10 @@ epochs = 1000
 
 # create model
 model = miniml.Model()
-model.add(1, 'linear', 'plain')
-model.add(64, 'relu', 'he')
-model.add(32, 'relu', 'he')
-model.add(1, 'linear', 'plain')
+model.dense(1, 'linear', 'plain')
+model.dense(64, 'relu', 'he')
+model.dense(32, 'relu', 'he')
+model.dense(1, 'linear', 'plain')
 
 # train model
 optimizer = miniml.Adam(

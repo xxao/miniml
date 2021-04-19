@@ -21,8 +21,8 @@ batch_size = 40
 
 # create model
 model = miniml.Model()
-model.add(5, 'relu', 'he')
-model.add(3, 'softmax', 'plain')
+model.dense(5, 'relu', 'he')
+model.dense(3, 'softmax', 'plain')
 
 # train model
 optimizer = miniml.Adam(
