@@ -59,7 +59,7 @@ class Model(object):
         self._layers.append(layer)
     
     
-    def conv2d(self, depth, ksize, stride, pad=SAME):
+    def conv2d(self, depth, ksize, stride, pad=SAME, init_method=HE):
         """
         Appends new 2D convolution layer.
         
@@ -76,9 +76,13 @@ class Model(object):
             pad: int, (int, int) or str
                 Initial data padding as a specific number or mode such as
                 'valid' or 'same'.
+            
+            init_method: str
+                W parameter initialization method such as 'plain', 'xavier'
+                or 'he'.
         """
         
-        layer = Conv2D(depth, ksize, stride, pad)
+        layer = Conv2D(depth, ksize, stride, pad, init_method)
         self._layers.append(layer)
     
     

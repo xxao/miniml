@@ -9,7 +9,7 @@ class Conv2D(Layer):
     """Represents a 2D convolution layer of neural network."""
     
     
-    def __init__(self, depth, ksize, stride, pad=SAME):
+    def __init__(self, depth, ksize, stride, pad=SAME, init_method=PLAIN):
         """
         Initializes a new instance of Conv2D.
         
@@ -26,12 +26,16 @@ class Conv2D(Layer):
             pad: int, (int, int) or str
                 Initial data padding as a specific number or mode such as
                 'valid' or 'same'.
+            
+            init_method: str
+                W initialization method name such as 'plain', 'xavier' or 'he'.
         """
         
         self._depth = int(depth)
         self._ksize = (ksize, ksize) if isinstance(ksize, int) else ksize
         self._stride = int(stride)
         self._pad = self._init_padding(pad, *self._ksize)
+        self._init_method = init_method
         
         self._X = None
         
@@ -97,8 +101,7 @@ class Conv2D(Layer):
         
         # init params
         if self._W is None:
-            self._W = np.random.randn(f_h, f_w, c_in, c_out)
-            self._b = np.random.randn(1, 1, 1, c_out)
+            self._init_params(f_h, f_w, c_in, c_out)
         
         # init output
         output = np.zeros((m, h_out, w_out, c_out))
@@ -195,3 +198,24 @@ class Conv2D(Layer):
             return (f_h - 1) // 2, (f_w - 1) // 2
         
         return 0, 0
+    
+    
+    def _init_params(self, f_h, f_w, c_in, c_out):
+        """Initializes params."""
+        
+        # init weights
+        if self._init_method == PLAIN:
+            self._W = np.random.randn(f_h, f_w, c_in, c_out) * 0.01
+        
+        elif self._init_method == XAVIER:
+            self._W = np.random.randn(f_h, f_w, c_in, c_out) * np.sqrt(1 / c_in)
+        
+        elif self._init_method == HE:
+            self._W = np.random.randn(f_h, f_w, c_in, c_out) * np.sqrt(2 / c_in)
+        
+        else:
+            raise ValueError("Unknown initialization method specified! -> '%s" % self._init_method)
+        
+        # init bias
+        # self._b = np.zeros(c_out)
+        self._b = np.random.randn(c_out)

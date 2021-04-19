@@ -10,7 +10,7 @@ class Dense(Layer):
     """Represents a fully connected linear layer of neural network."""
     
     
-    def __init__(self, nodes, activation=RELU, w_init=HE):
+    def __init__(self, nodes, activation=RELU, init_method=HE):
         """
         Initializes a new instance of Dense.
         
@@ -22,12 +22,12 @@ class Dense(Layer):
                 Activation function name such as 'sigmoid', 'relu', 'tanh' or
                 'softmax'. If set to None, activation is not applied.
             
-            w_init: str
+            init_method: str
                 W initialization method name such as 'plain', 'xavier' or 'he'.
         """
         
         self._nodes = int(nodes)
-        self._w_init = w_init
+        self._init_method = init_method
         self._activation = self._init_activation(activation)
         
         self._X = None
@@ -51,7 +51,7 @@ class Dense(Layer):
     def __str__(self):
         """Gets string representation."""
         
-        return "Dense(%d | %s | %s)" % (self._nodes, self._w_init, self._activation)
+        return "Dense(%d | %s | %s)" % (self._nodes, self._init_method, self._activation)
     
     
     @property
@@ -362,18 +362,18 @@ class Dense(Layer):
     def _init_params(self, n_in, n_out):
         """Initializes params."""
         
-        # init bias
-        self._b = np.zeros((1, n_out))
-        
         # init weights
-        if self._w_init == PLAIN:
+        if self._init_method == PLAIN:
             self._W = np.random.randn(n_out, n_in) * 0.01
         
-        elif self._w_init == XAVIER:
+        elif self._init_method == XAVIER:
             self._W = np.random.randn(n_out, n_in) * np.sqrt(1 / n_in)
         
-        elif self._w_init == HE:
+        elif self._init_method == HE:
             self._W = np.random.randn(n_out, n_in) * np.sqrt(2 / n_in)
         
         else:
-            raise ValueError("Unknown initialization method specified! -> '%s" % self._w_init)
+            raise ValueError("Unknown initialization method specified! -> '%s" % self._init_method)
+        
+        # init bias
+        self._b = np.zeros((1, n_out))
