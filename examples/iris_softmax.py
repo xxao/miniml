@@ -25,13 +25,13 @@ model.add(5, 'relu', 'he')
 model.add(3, 'softmax', 'plain')
 
 # train model
-optimizer = miniml.Optimizer(
+optimizer = miniml.Adam(
     cost = 'ce',
     epochs = epochs,
     init_seed = 48,
     verbose = 1000)
 
-costs = optimizer.train_adam(model, X, Y, rate)
+costs = optimizer.train(model, X, Y, rate)
 
 # plot results
 plot_costs(costs, rate, epochs)

@@ -22,7 +22,7 @@ model.add(3, 'relu', 'xavier')
 model.add(1, 'sigmoid', 'xavier')
 
 # train model
-optimizer = miniml.Optimizer(
+optimizer = miniml.GradDescent(
     cost = 'bce',
     epochs = epochs,
     init_seed = 3,
@@ -30,7 +30,7 @@ optimizer = miniml.Optimizer(
     store = 1000,
     verbose = 10000)
 
-costs = optimizer.train_gd(model, X, Y,
+costs = optimizer.train(model, X, Y,
     rate = rate,
     keep = keep,
     lamb = lamb)

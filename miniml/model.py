@@ -200,20 +200,3 @@ class Model(object):
         # process hidden layers
         for layer in reversed(self._layers[:-1]):
             dA = layer.backward(dA, lamb=lamb)
-    
-    
-    def update(self, optimizer=GD, **optimizer_params):
-        """
-        Updates params in all layers by specified optimizer.
-        
-        Args:
-            optimizer: str
-                Optimizer name such as 'gd', 'momentum', 'rmsprop',
-                'adagrad' or 'adam'.
-            
-            optimizer_params: {str:any}
-                Specific optimizer params.
-        """
-        
-        for layer in reversed(self._layers):
-            layer.update(optimizer, **optimizer_params)

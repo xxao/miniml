@@ -19,8 +19,8 @@ model.add(5, 'relu', 'he')
 model.add(2, 'relu', 'he')
 model.add(1, 'sigmoid', 'he')
 
-# train model
-optimizer = miniml.Optimizer(
+# train model (try different optimizers)
+optimizer = miniml.Adam(
     cost = 'bce',
     epochs = epochs,
     batch_size = batch_size,
@@ -28,11 +28,7 @@ optimizer = miniml.Optimizer(
     init_seed = 3,
     store = 1000)
 
-# costs = optimizer.train_gd(model, X, Y, rate=rate)
-# costs = optimizer.train_momentum(model, X, Y, rate=rate, beta=0.9)
-# costs = optimizer.train_rmsprop(model, X, Y, rate=rate, beta=0.9)
-costs = optimizer.train_adam(model, X, Y, rate=rate, beta1=0.9, beta2=0.999)
-# costs = optimizer.train_adagrad(model, X, Y, rate=rate)
+costs = optimizer.train(model, X, Y, rate)
 
 # plot results
 predict(model, X, Y)

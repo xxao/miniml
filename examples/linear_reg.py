@@ -21,13 +21,13 @@ model = miniml.Model()
 model.add(1, 'linear', 'plain')
 
 # train model
-optimizer = miniml.Optimizer(
+optimizer = miniml.GradDescent(
     cost = 'mse',
     epochs = epochs,
     init_seed = 48,
     verbose = 500)
 
-costs = optimizer.train_gd(model, X, Y, rate)
+costs = optimizer.train(model, X, Y, rate)
 
 # plot results
 plot_costs(costs, rate, epochs)

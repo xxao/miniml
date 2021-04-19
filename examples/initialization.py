@@ -20,13 +20,13 @@ model.add(5, 'relu', 'he')
 model.add(1, 'sigmoid', 'he')
 
 # train model
-optimizer = miniml.Optimizer(
+optimizer = miniml.GradDescent(
     cost = 'bce',
     epochs = epochs,
     init_seed = 3,
     store = 1000)
 
-costs = optimizer.train_gd(model, X, Y, rate=rate)
+costs = optimizer.train(model, X, Y, rate=rate)
 
 # plot results
 predict(model, X, Y)

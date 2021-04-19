@@ -178,6 +178,25 @@ class Conv2D(Layer):
         return output
     
     
+    def update(self, W, b):
+        """
+        Updates layer params.
+        
+        Args:
+            W: np.ndarray
+                Weights.
+            
+            b: np.ndarray
+                Biases.
+        """
+        
+        assert(W.shape == self._W.shape)
+        assert(b.shape == self._b.shape)
+        
+        self._W = W
+        self._b = b
+    
+    
     def _zero_pad(self, x):
         """Apply zero-padding."""
         

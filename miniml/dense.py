@@ -9,6 +9,8 @@ from . layer import Layer
 class Dense(Layer):
     """Represents a fully connected linear layer of neural network."""
     
+    OPTIMIZE = True
+    
     
     def __init__(self, nodes, activation=RELU, init_method=HE):
         """
@@ -40,12 +42,6 @@ class Dense(Layer):
         
         self._keep = 1
         self._mask = None
-        
-        self._t = 0
-        self._vdW = None
-        self._vdb = None
-        self._sdW = None
-        self._sdb = None
     
     
     def __str__(self):
@@ -68,6 +64,20 @@ class Dense(Layer):
         return self._b
     
     
+    @property
+    def dW(self):
+        """Gets current weights gradients."""
+        
+        return self._dW
+    
+    
+    @property
+    def db(self):
+        """Gets current biases gradients."""
+        
+        return self._db
+    
+    
     def reset(self):
         """Resets params and caches in all layers."""
         
@@ -81,12 +91,6 @@ class Dense(Layer):
         
         self._keep = 1
         self._mask = None
-        
-        self._t = 0
-        self._vdW = None
-        self._vdb = None
-        self._sdW = None
-        self._sdb = None
     
     
     def forward(self, X, keep=1, **kwargs):
@@ -168,168 +172,23 @@ class Dense(Layer):
         return dA
     
     
-    def update(self, optimizer=GD, **optimizer_params):
+    def update(self, W, b):
         """
-        Updates params by specified optimizer.
+        Updates layer params.
         
         Args:
-            optimizer: str
-                Optimizer name.
+            W: np.ndarray
+                Weights.
             
-            optimizer_params: {str:any}
-                Specific optimizer params.
+            b: np.ndarray
+                Biases.
         """
         
-        # update by gradient descent
-        if optimizer == GD:
-            self._update_gd(**optimizer_params)
+        assert(W.shape == self._W.shape)
+        assert(b.shape == self._b.shape)
         
-        # update by gradient descent with Momentum.
-        elif optimizer == MOMENTUM:
-            self._update_momentum(**optimizer_params)
-        
-        # update by gradient descent with RMSprop.
-        elif optimizer == RMSPROP:
-            self._update_rmsprop(**optimizer_params)
-        
-        # update by gradient descent with Adam.
-        elif optimizer == ADAM:
-            self._update_adam(**optimizer_params)
-        
-        # update by gradient descent with Adagrad.
-        elif optimizer == ADAGRAD:
-            self._update_adagrad(**optimizer_params)
-        
-        # unknown optimizer
-        else:
-            raise ValueError("Unknown optimizer specified! -> '%s" % optimizer)
-    
-    
-    def _update_gd(self, rate=0.1):
-        """
-        Updates params by gradient descent.
-        
-        Args:
-            rate: float
-                Learning rate.
-        """
-        
-        self._W = self._W - rate * self._dW
-        self._b = self._b - rate * self._db
-    
-    
-    def _update_momentum(self, rate=0.1, beta=0.9):
-        """
-        Updates params by gradient descent with Momentum.
-        
-        Args:
-            rate: float
-                Learning rate.
-            
-            beta:
-                Momentum parameter.
-        """
-        
-        if self._vdW is None:
-            self._vdW = np.zeros(self._dW.shape)
-            self._vdb = np.zeros(self._db.shape)
-        
-        self._vdW = beta * self._vdW + (1 - beta) * self._dW
-        self._vdb = beta * self._vdb + (1 - beta) * self._db
-        
-        self._W = self._W - rate * self._vdW
-        self._b = self._b - rate * self._vdb
-    
-    
-    def _update_rmsprop(self, rate=0.1, beta=0.9, epsilon=1e-8):
-        """
-        Updates params by gradient descent with RMSprop.
-        
-        Args:
-            rate: float
-                Learning rate.
-            
-            beta: float
-                Momentum parameter.
-            
-            epsilon: float
-                Zero division corrector.
-        """
-        
-        if self._sdW is None:
-            self._sdW = np.zeros(self._dW.shape)
-            self._sdb = np.zeros(self._db.shape)
-        
-        self._sdW = beta * self._sdW + (1 - beta) * self._dW**2
-        self._sdb = beta * self._sdb + (1 - beta) * self._db**2
-        
-        self._W = self._W - rate * self._dW / np.sqrt(self._sdW + epsilon)
-        self._b = self._b - rate * self._db / np.sqrt(self._sdb + epsilon)
-    
-    
-    def _update_adam(self, rate=0.1, beta1=0.9, beta2=0.999, epsilon=1e-8):
-        """
-        Updates params by gradient descent with Adam.
-        
-        Args:
-            rate: float
-                Learning rate.
-            
-            beta1: float
-                First momentum parameter.
-            
-            beta2: float
-                Second momentum parameter.
-            
-            epsilon: float
-                Zero division corrector.
-        """
-        
-        self._t += 1
-        
-        if self._vdW is None:
-            self._vdW = np.zeros(self._dW.shape)
-            self._vdb = np.zeros(self._db.shape)
-            self._sdW = np.zeros(self._dW.shape)
-            self._sdb = np.zeros(self._db.shape)
-        
-        self._vdW = beta1 * self._vdW + (1 - beta1) * self._dW
-        self._vdb = beta1 * self._vdb + (1 - beta1) * self._db
-        
-        v_corr_dW = self._vdW / (1 - beta1**self._t)
-        v_corr_db = self._vdb / (1 - beta1**self._t)
-        
-        self._sdW = beta2 * self._sdW + (1 - beta2) * self._dW**2
-        self._sdb = beta2 * self._sdb + (1 - beta2) * self._db**2
-        
-        s_corr_dW = self._sdW / (1 - beta2**self._t)
-        s_corr_db = self._sdb / (1 - beta2**self._t)
-        
-        self._W = self._W - rate * v_corr_dW / (s_corr_dW**0.5 + epsilon)
-        self._b = self._b - rate * v_corr_db / (s_corr_db**0.5 + epsilon)
-    
-    
-    def _update_adagrad(self, rate=0.1, epsilon=1e-8):
-        """
-        Updates params by gradient descent with Adagrad.
-        
-        Args:
-            rate: float
-                Learning rate.
-            
-            epsilon: float
-                Zero division corrector.
-        """
-        
-        if self._sdW is None:
-            self._sdW = np.zeros(self._dW.shape)
-            self._sdb = np.zeros(self._db.shape)
-        
-        self._sdW = self._sdW + self._dW**2
-        self._sdb = self._sdb + self._db**2
-        
-        self._W = self._W - rate * self._dW / np.sqrt(self._sdW + epsilon)
-        self._b = self._b - rate * self._db / np.sqrt(self._sdb + epsilon)
+        self._W = W
+        self._b = b
     
     
     def _init_activation(self, activation):

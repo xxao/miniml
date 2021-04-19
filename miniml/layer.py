@@ -4,6 +4,8 @@
 class Layer(object):
     """Represents a base class for various types of neural network layer."""
     
+    OPTIMIZE = False
+    
     
     def __repr__(self):
         """Gets debug representation."""
@@ -44,6 +46,21 @@ class Layer(object):
         
         Returns:
             Gradients from this layer.
+        """
+        
+        pass
+    
+    
+    def update(self, W, b):
+        """
+        Updates layer params.
+        
+        Args:
+            W: np.ndarray
+                Weights.
+            
+            b: np.ndarray
+                Biases.
         """
         
         pass
