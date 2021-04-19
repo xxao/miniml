@@ -9,12 +9,12 @@ class Pool(Layer):
     """Represents a pooling layer of neural network."""
     
     
-    def __init__(self, size, stride, mode=MAX):
+    def __init__(self, ksize, stride, mode=MAX):
         """
         Initializes a new instance of Pool.
         
         Args:
-            size: int or (int, int)
+            ksize: int or (int, int)
                 Size of the kernel as (h, w) or single integer if squared.
             
             stride: int
@@ -25,7 +25,7 @@ class Pool(Layer):
         """
         
         self._mode = mode
-        self._size = (size, size) if isinstance(size, int) else size
+        self._ksize = (ksize, ksize) if isinstance(ksize, int) else ksize
         self._stride = int(stride)
         
         self._X = None
@@ -34,7 +34,7 @@ class Pool(Layer):
     def __str__(self):
         """Gets string representation."""
         
-        return "%sPool(%dx%d)" % (self._mode.title(), self._size[0], self._size[1])
+        return "%sPool(%dx%d)" % (self._mode.title(), self._ksize[0], self._ksize[1])
     
     
     def reset(self):
@@ -60,7 +60,7 @@ class Pool(Layer):
         
         # get dimensions
         m, h_in, w_in, c_in = X.shape
-        f_h, f_w = self._size
+        f_h, f_w = self._ksize
         h_out = int(1 + (h_in - f_h) / self._stride)
         w_out = int(1 + (w_in - f_w) / self._stride)
         c_out = c_in
@@ -106,7 +106,7 @@ class Pool(Layer):
         """
         
         # get dimensions
-        f_h, f_w = self._size
+        f_h, f_w = self._ksize
         m, h_out, w_out, c_out = dA.shape
         
         # init output

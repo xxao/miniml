@@ -9,7 +9,7 @@ class Conv2D(Layer):
     """Represents a 2D convolution layer of neural network."""
     
     
-    def __init__(self, depth, size, stride, pad=SAME):
+    def __init__(self, depth, ksize, stride, pad=SAME):
         """
         Initializes a new instance of Conv2D.
         
@@ -17,7 +17,7 @@ class Conv2D(Layer):
             depth: int
                 Number of filters.
             
-            size: int or (int, int)
+            ksize: int or (int, int)
                 Size of the kernel as (n_h, n_w) or single integer if squared.
             
             stride: int
@@ -29,9 +29,9 @@ class Conv2D(Layer):
         """
         
         self._depth = int(depth)
-        self._size = (size, size) if isinstance(size, int) else size
+        self._ksize = (ksize, ksize) if isinstance(ksize, int) else ksize
         self._stride = int(stride)
-        self._pad = self._init_padding(pad, *self._size)
+        self._pad = self._init_padding(pad, *self._ksize)
         
         self._X = None
         
@@ -44,7 +44,7 @@ class Conv2D(Layer):
     def __str__(self):
         """Gets string representation."""
         
-        return "Conv2D(%dx%dx%d)" % (self._size[0], self._size[0], self._depth)
+        return "Conv2D(%dx%dx%d)" % (self._ksize[0], self._ksize[0], self._depth)
     
     
     @property
@@ -89,7 +89,7 @@ class Conv2D(Layer):
         
         # get dimensions
         m, h_in, w_in, c_in = X.shape
-        f_h, f_w = self._size
+        f_h, f_w = self._ksize
         p_h, p_w = self._pad
         h_out = int(1 + (h_in - f_h + 2*p_h) / self._stride)
         w_out = int(1 + (w_in - f_w + 2*p_w) / self._stride)
@@ -138,7 +138,7 @@ class Conv2D(Layer):
         # get dimensions
         m, h_in, w_in, c_in = self._X.shape
         m, h_out, w_out, c_out = dA.shape
-        f_h, f_w = self._size
+        f_h, f_w = self._ksize
         p_h, p_w = self._pad
         
         # apply padding

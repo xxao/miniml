@@ -59,7 +59,7 @@ class Model(object):
         self._layers.append(layer)
     
     
-    def conv2d(self, depth, size, stride, pad=SAME):
+    def conv2d(self, depth, ksize, stride, pad=SAME):
         """
         Appends new 2D convolution layer.
         
@@ -67,7 +67,7 @@ class Model(object):
             depth: int
                 Number of filters.
             
-            size: int or (int, int)
+            ksize: int or (int, int)
                 Size of the kernel as (n_h, n_w) or single integer if squared.
             
             stride: int
@@ -78,16 +78,16 @@ class Model(object):
                 'valid' or 'same'.
         """
         
-        layer = Conv2D(depth, size, stride, pad)
+        layer = Conv2D(depth, ksize, stride, pad)
         self._layers.append(layer)
     
     
-    def pool(self, size, stride, mode=MAX):
+    def pool(self, ksize, stride, mode=MAX):
         """
         Appends new pooling layer.
         
         Args:
-            size: int or (int, int)
+            ksize: int or (int, int)
                 Size of the kernel as (h, w) or single integer if squared.
             
             stride: int
@@ -97,7 +97,7 @@ class Model(object):
                 Pooling modes such as 'max' or 'avg'.
         """
         
-        layer = Pool(size, stride, mode)
+        layer = Pool(ksize, stride, mode)
         self._layers.append(layer)
     
     
@@ -117,8 +117,8 @@ class Model(object):
                 Number of output connections (neurons).
             
             activation: str
-                Activation function name such as 'sigmoid', 'relu', 'tanh'
-                or 'softmax'.
+                Activation function name such as 'sigmoid', 'relu', 'tanh' or
+                'softmax'. If set to None, activation is not applied.
             
             init_method: str
                 W parameter initialization method such as 'plain', 'xavier'

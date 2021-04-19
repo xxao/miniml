@@ -30,7 +30,7 @@ class Flatten(Layer):
                 The expected shape is (m, ..., n_C).
         
         Returns:
-            Flattened data.
+            Flattened data into (m, ?).
         """
         
         self._shape = X.shape
@@ -44,7 +44,7 @@ class Flatten(Layer):
         Args:
             dA:
                 Gradients from previous (right) layer.
-                The expected shape is (m, 1).
+                The expected shape is (m, ?).
         
         Returns:
             Gradients reshaped as (m, ..., n_C).
