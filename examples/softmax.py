@@ -43,14 +43,14 @@ model = miniml.Model()
 model.add(C, 'softmax', 'plain')
 
 # train model
-optimizer = miniml.Optimizer(
+optimizer = miniml.GradDescent(
     cost = 'ce',
     epochs = epochs,
     init_seed = 48,
     store = 1,
     verbose = 10)
 
-costs = optimizer.train_gd(model, X, Y, rate)
+costs = optimizer.train(model, X, Y, rate)
 
 # plot results
 predict(model, X, Y)

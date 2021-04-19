@@ -38,8 +38,14 @@ rate = 0.01
 epochs = 1000
 
 # train model
-optimizer = miniml.Optimizer(cost='mse', epochs=epochs, init_seed=48, store=10, verbose=200)
-costs = optimizer.train_adam(model, X, Y, rate)
+optimizer = miniml.Adam(
+    cost = 'mse',
+    epochs = epochs,
+    init_seed = 48,
+    store = 10,
+    verbose = 200)
+
+costs = optimizer.train(model, X, Y, rate)
 
 # plot results
 plot_costs(costs, rate, epochs)

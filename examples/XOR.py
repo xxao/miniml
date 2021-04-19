@@ -31,12 +31,12 @@ model.add(1, 'sigmoid', 'xavier')
 
 # train model
 # note that original implementation is without averaging across examples in LinearLayer.backward(...)
-optimizer = miniml.Optimizer(
+optimizer = miniml.GradDescent(
     cost = 'mse',
     epochs = epochs,
     init_seed = 48)
 
-costs = optimizer.train_gd(model, X, Y, rate)
+costs = optimizer.train(model, X, Y, rate)
 
 # plot results
 predict(model, X, Y)
