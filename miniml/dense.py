@@ -18,8 +18,9 @@ class Dense(Layer):
             nodes: int
                 Number of output connections (neurons).
             
-            activation: str
-                Activation function name such as 'sigmoid', 'relu', 'tanh' or 'softmax'.
+            activation: str or None
+                Activation function name such as 'sigmoid', 'relu', 'tanh' or
+                'softmax'. If set to None, activation is not applied.
             
             w_init: str
                 W initialization method name such as 'plain', 'xavier' or 'he'.
@@ -113,7 +114,11 @@ class Dense(Layer):
         
         # forward propagation
         Z = np.dot(self._W, self._X) + self._b
-        self._A = self._activation.forward(Z)
+        
+        # apply activation
+        self._A = Z
+        if self._activation is not None:
+            self._A = self._activation.forward(Z)
         
         # apply dropout
         if self._keep < 1:
@@ -147,8 +152,12 @@ class Dense(Layer):
             dA = np.multiply(dA, self._mask)
             dA = dA / self._keep
         
+        # apply activation
+        dZ = dA
+        if self._activation is not None:
+            dZ = self._activation.backward(self._A, dA)
+        
         # calc gradients
-        dZ = self._activation.backward(self._A, dA)
         self._dW = (1 / m) * np.dot(dZ, self._X.T) + (lamb / m) * self._W
         self._db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
         
@@ -323,6 +332,9 @@ class Dense(Layer):
     
     def _init_activation(self, activation):
         """Initializes activation function."""
+        
+        if activation is None:
+            return None
         
         if isinstance(activation, Activation):
             return activation
