@@ -27,10 +27,10 @@ class Flatten(Layer):
         Args:
             X: np.ndarray
                 Input data/activations from previous (left) layer.
-                The expected shape is (m, ..., n_C).
+                The expected shape is (m, n_h, n_w, n_c).
         
         Returns:
-            Flattened data into (m, ?).
+            Flattened data into (m, n_h x n_w x n_c).
         """
         
         self._shape = X.shape
@@ -47,7 +47,7 @@ class Flatten(Layer):
                 The expected shape is (m, ?).
         
         Returns:
-            Gradients reshaped as (m, ..., n_C).
+            Gradients reshaped as (m, n_h, n_w, n_c).
         """
         
         return dA.reshape(self._shape)

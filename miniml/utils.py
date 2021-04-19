@@ -9,17 +9,17 @@ def shuffle_data(X, Y, seed=None):
     Shuffles data by random permutations.
     
     Args:
-        X:
-            Input dataset.
+        X: np.ndarray
+            Input dataset of shape (m, ...).
         
-        Y:
-            Output dataset.
+        Y: np.ndarray
+            Output dataset (m, ...).
         
         seed: int or None
             Random seed for permutations.
     
     Returns:
-            XShuffled data sets X and Y.
+            Shuffled datasets (X, Y).
     """
     
     # set random seed
@@ -73,11 +73,11 @@ def make_mini_batches(X, Y, size=64, seed=None):
     Initializes random mini-batches from X, Y.
     
     Args:
-        X:
-            Input dataset.
+        X: np.ndarray
+            Input dataset of shape (n, m).
         
-        Y:
-            Output dataset.
+        Y: np.ndarray
+            Output dataset of shape (n_y, m).
         
         size: int
             Size of a mini-batch. Should be 64, 128, 256 or 512. If set to
@@ -87,7 +87,7 @@ def make_mini_batches(X, Y, size=64, seed=None):
             Random seed for mini-batches creation.
     
     Returns:
-        List of mini-batches as [(X, Y),]
+        List of mini-batches as [(X_batch, Y_batch),]
     """
     
     # check if needed

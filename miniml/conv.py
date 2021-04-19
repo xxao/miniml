@@ -79,7 +79,7 @@ class Conv2D(Layer):
         Args:
             X: np.ndarray
                 Input data/activations from previous (left) layer.
-                The expected shape is (m, n_H, n_W, n_C).
+                The expected shape is (m, n_h, n_w, n_c).
         
         Returns:
             Calculated activations from this layer.
@@ -129,7 +129,7 @@ class Conv2D(Layer):
         Args:
             dA:
                 Gradients from previous (right) layer.
-                The expected shape is (m, n_H, n_W, n_C).
+                The expected shape is (m, n_h, n_w, n_c).
         
         Returns:
             Gradients from this layer.
