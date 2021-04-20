@@ -75,6 +75,24 @@ class Dense(Layer):
         return self._db
     
     
+    def outshape(self, shape):
+        """
+        Calculates output shape.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        
+        return (self._nodes, )
+    
+    
     def clear(self):
         """Clears params and caches."""
         
@@ -109,7 +127,7 @@ class Dense(Layer):
         self._init_params(shape[0], self._nodes)
         
         # return output shape
-        return (self._nodes, )
+        return self.outshape(shape)
     
     
     def forward(self, X, keep=1, **kwargs):

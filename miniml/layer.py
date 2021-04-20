@@ -13,6 +13,24 @@ class Layer(object):
         return self.__str__()
     
     
+    def outshape(self, shape):
+        """
+        Calculates output shape.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        
+        return shape
+    
+    
     def clear(self):
         """Clears params and caches."""
         
@@ -38,7 +56,7 @@ class Layer(object):
         self.clear()
         
         # return output shape
-        return shape
+        return self.outshape(shape)
     
     
     def forward(self, X, **kwargs):

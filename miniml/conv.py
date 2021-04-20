@@ -65,6 +65,31 @@ class Conv2D(Layer):
         return self._b
     
     
+    def outshape(self, shape):
+        """
+        Calculates output shape.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        
+        h_in, w_in, c_in = shape
+        f_h, f_w = self._ksize
+        p_h, p_w = self._pad
+        h_out = int(1 + (h_in - f_h + 2*p_h) / self._stride)
+        w_out = int(1 + (w_in - f_w + 2*p_w) / self._stride)
+        c_out = self._depth
+        
+        return h_out, w_out, c_out
+    
+    
     def clear(self):
         """Clears params and caches."""
         
@@ -90,7 +115,6 @@ class Conv2D(Layer):
                 Output shape. The shape is provided without first dimension for
                 number of samples (m).
         """
-        print(self._pad)
         
         # clear params and caches
         self.clear()
@@ -98,10 +122,7 @@ class Conv2D(Layer):
         # get dimensions
         h_in, w_in, c_in = shape
         f_h, f_w = self._ksize
-        p_h, p_w = self._pad
-        h_out = int(1 + (h_in - f_h + 2*p_h) / self._stride)
-        w_out = int(1 + (w_in - f_w + 2*p_w) / self._stride)
-        c_out = self._depth
+        h_out, w_out, c_out = self.outshape(shape)
         
         # init params
         self._init_params(f_h, f_w, c_in, c_out)

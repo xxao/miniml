@@ -20,15 +20,9 @@ class Flatten(Layer):
         return "Flatten"
     
     
-    def clear(self):
-        """Clears params and caches."""
-        
-        self._shape = None
-    
-    
-    def initialize(self, shape):
+    def outshape(self, shape):
         """
-        Clears caches and re-initializes params.
+        Calculates output shape.
         
         Args:
             shape: (int,)
@@ -41,11 +35,13 @@ class Flatten(Layer):
                 number of samples (m).
         """
         
-        # clear params and caches
-        self.clear()
-        
-        # return output shape
         return (np.prod(shape), )
+    
+    
+    def clear(self):
+        """Clears params and caches."""
+        
+        self._shape = None
     
     
     def forward(self, X, **kwargs):

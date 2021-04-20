@@ -63,9 +63,7 @@ class Model(object):
         """
         
         for layer in self._layers:
-            s_in = shape
             shape = layer.initialize(shape)
-            print(layer, s_in, "->", shape)
     
     
     def predict(self, A):
