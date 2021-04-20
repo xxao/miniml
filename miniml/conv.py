@@ -24,9 +24,9 @@ class Conv2D(Layer):
             stride: int
                 Single step kernel shift.
             
-            pad: int, (int, int) or str
-                Initial data padding as a specific number or mode such as
-                'valid' or 'same'.
+            pad: str, int, (int, int) or (int, int, int, int)
+                Initial data padding as 'valid' or 'same' mode or direct values
+                as (p_h, p_w) or (p_t, p_b, p_l, p_r).
             
             activation: str or None
                 Activation function name such as 'sigmoid', 'relu' or 'tanh'.
@@ -89,9 +89,9 @@ class Conv2D(Layer):
         
         h_in, w_in, c_in = shape
         f_h, f_w = self._ksize
-        p_h, p_w = self._pad
-        h_out = int(1 + (h_in - f_h + 2*p_h) / self._stride)
-        w_out = int(1 + (w_in - f_w + 2*p_w) / self._stride)
+        p_t, p_b, p_l, p_r = self._pad
+        h_out = int(1 + (h_in - f_h + p_t + p_b) / self._stride)
+        w_out = int(1 + (w_in - f_w + p_l + p_r) / self._stride)
         c_out = self._depth
         
         return h_out, w_out, c_out
@@ -157,9 +157,9 @@ class Conv2D(Layer):
         # get dimensions
         m, h_in, w_in, c_in = X.shape
         f_h, f_w = self._ksize
-        p_h, p_w = self._pad
-        h_out = int(1 + (h_in - f_h + 2*p_h) / self._stride)
-        w_out = int(1 + (w_in - f_w + 2*p_w) / self._stride)
+        p_t, p_b, p_l, p_r = self._pad
+        h_out = int(1 + (h_in - f_h + p_t + p_b) / self._stride)
+        w_out = int(1 + (w_in - f_w + p_l + p_r) / self._stride)
         c_out = self._depth
         
         # init params
@@ -213,7 +213,7 @@ class Conv2D(Layer):
         m, h_in, w_in, c_in = self._X.shape
         m, h_out, w_out, c_out = dA.shape
         f_h, f_w = self._ksize
-        p_h, p_w = self._pad
+        p_t, p_b, p_l, p_r = self._pad
         
         # apply activation
         dZ = dA
@@ -249,7 +249,7 @@ class Conv2D(Layer):
                     axis = 0)
         
         self._dW /= m
-        dA = dA[:, p_h:p_h+h_in, p_w:p_w+w_in, :]
+        dA = dA[:, p_t:p_t+h_in, p_l:p_l+w_in, :]
         
         return dA
     
@@ -273,7 +273,9 @@ class Conv2D(Layer):
     def _zero_pad(self, x):
         """Apply zero-padding."""
         
-        return np.pad(x, ((0, 0), (self._pad[0], self._pad[0]), (self._pad[1], self._pad[1]), (0, 0)),
+        p_t, p_b, p_l, p_r = self._pad
+        
+        return np.pad(x, ((0, 0), (p_t, p_b), (p_l, p_r), (0, 0)),
             mode = 'constant',
             constant_values = (0, 0))
     
@@ -306,16 +308,32 @@ class Conv2D(Layer):
         """Initialize padding."""
         
         if isinstance(pad, int):
-            return pad, pad
+            return pad, pad, pad, pad
         
-        elif pad == SAME:
-            
-            if not self._ksize[0] % 2 or not self._ksize[1] % 2:
-                raise ValueError("Cannot calculate 'same' padding for even kernel.")
-            
-            return (f_h - 1) // 2, (f_w - 1) // 2
+        if pad == VALID:
+            return 0, 0, 0, 0
         
-        return 0, 0
+        if pad == SAME:
+            p_t = (f_h - 1) // 2
+            p_b = p_t
+            p_l = (f_w - 1) // 2
+            p_r = p_l
+            
+            if not self._ksize[0] % 2:
+                p_b += 1
+            
+            if not self._ksize[1] % 2:
+                p_r += 1
+            
+            return p_t, p_b, p_l, p_r
+        
+        if len(pad) == 2:
+            return pad[0], pad[0], pad[1], pad[1]
+        
+        if len(pad) == 4:
+            return pad
+        
+        raise ValueError("Incorrect padding! -> %s" % str(pad))
     
     
     def _init_params(self, f_h, f_w, c_in, c_out):

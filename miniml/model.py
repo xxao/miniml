@@ -150,9 +150,9 @@ class Model(object):
             stride: int
                 Single step kernel shift.
             
-            pad: int, (int, int) or str
-                Initial data padding as a specific number or mode such as
-                'valid' or 'same'.
+            pad: str, int, (int, int) or (int, int, int, int)
+                Initial data padding as 'valid' or 'same' mode or direct values
+                as (p_h, p_w) or (p_t, p_b, p_l, p_r).
             
             activation: str or None
                 Activation function name such as 'sigmoid', 'relu' or 'tanh'.
