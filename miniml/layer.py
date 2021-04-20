@@ -13,10 +13,32 @@ class Layer(object):
         return self.__str__()
     
     
-    def reset(self):
-        """Resets params and caches in all layers."""
+    def clear(self):
+        """Clears params and caches."""
         
         pass
+    
+    
+    def initialize(self, shape):
+        """
+        Clears caches and re-initializes params.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        
+        # clear params and caches
+        self.clear()
+        
+        # return output shape
+        return shape
     
     
     def forward(self, X, **kwargs):

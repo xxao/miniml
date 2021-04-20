@@ -44,7 +44,7 @@ class Dense(Layer):
     def __str__(self):
         """Gets string representation."""
         
-        return "Dense(%d | %s | %s)" % (self._nodes, self._init_method, self._activation)
+        return "Dense(%d|%s)" % (self._nodes, self._activation)
     
     
     @property
@@ -75,8 +75,8 @@ class Dense(Layer):
         return self._db
     
     
-    def reset(self):
-        """Resets params and caches in all layers."""
+    def clear(self):
+        """Clears params and caches."""
         
         self._X = None
         self._A = None
@@ -85,6 +85,31 @@ class Dense(Layer):
         self._b = None
         self._dW = None
         self._db = None
+    
+    
+    def initialize(self, shape):
+        """
+        Clears caches and re-initializes params.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        
+        # clear params and caches
+        self.clear()
+        
+        # init params
+        self._init_params(shape[0], self._nodes)
+        
+        # return output shape
+        return (self._nodes, )
     
     
     def forward(self, X, keep=1, **kwargs):

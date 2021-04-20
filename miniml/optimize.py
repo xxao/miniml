@@ -90,15 +90,15 @@ class Optimizer(object):
         batch_seed = self._batch_seed or 0
         
         # reset model params and cashes
-        model.reset()
+        model.clear()
         
         # reset optimizer cache
         self._cache = [None]*len(model.layers)
         
-        # set layers init seed
+        # initialize layers with given seed
         if self._init_seed:
             np.random.seed(self._init_seed)
-            model.predict(X[:1])
+            model.initialize(X[0].shape)
         
         # train model
         for epoch in range(self._epochs):

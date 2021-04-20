@@ -40,11 +40,32 @@ class Model(object):
         return tuple(self._layers)
     
     
-    def reset(self):
+    def clear(self):
         """Resets params and caches in all layers."""
         
         for layer in self._layers:
-            layer.reset()
+            layer.clear()
+    
+    
+    def initialize(self, shape):
+        """
+        Clears caches and re-initializes params in all layers.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        
+        for layer in self._layers:
+            s_in = shape
+            shape = layer.initialize(shape)
+            print(layer, s_in, "->", shape)
     
     
     def predict(self, A):

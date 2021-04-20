@@ -37,10 +37,39 @@ class Pool(Layer):
         return "%sPool(%dx%d)" % (self._mode.title(), self._ksize[0], self._ksize[1])
     
     
-    def reset(self):
-        """Resets params and caches in all layers."""
+    def clear(self):
+        """Clears params and caches."""
         
         self._X = None
+    
+    
+    def initialize(self, shape):
+        """
+        Clears caches and re-initializes params.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        
+        # clear params and caches
+        self.clear()
+        
+        # get dimensions
+        h_in, w_in, c_in = shape
+        f_h, f_w = self._ksize
+        h_out = int(1 + (h_in - f_h) / self._stride)
+        w_out = int(1 + (w_in - f_w) / self._stride)
+        c_out = c_in
+        
+        # return output shape
+        return h_out, w_out, c_out
     
     
     def forward(self, X, **kwargs):

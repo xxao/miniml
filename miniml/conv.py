@@ -9,7 +9,7 @@ class Conv2D(Layer):
     """Represents a 2D convolution layer of neural network."""
     
     
-    def __init__(self, depth, ksize, stride, pad=SAME, init_method=PLAIN):
+    def __init__(self, depth, ksize, stride, pad=VALID, init_method=PLAIN):
         """
         Initializes a new instance of Conv2D.
         
@@ -65,8 +65,8 @@ class Conv2D(Layer):
         return self._b
     
     
-    def reset(self):
-        """Resets params and caches in all layers."""
+    def clear(self):
+        """Clears params and caches."""
         
         self._X = None
         
@@ -74,6 +74,40 @@ class Conv2D(Layer):
         self._b = None
         self._dW = None
         self._db = None
+    
+    
+    def initialize(self, shape):
+        """
+        Clears caches and re-initializes params.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        print(self._pad)
+        
+        # clear params and caches
+        self.clear()
+        
+        # get dimensions
+        h_in, w_in, c_in = shape
+        f_h, f_w = self._ksize
+        p_h, p_w = self._pad
+        h_out = int(1 + (h_in - f_h + 2*p_h) / self._stride)
+        w_out = int(1 + (w_in - f_w + 2*p_w) / self._stride)
+        c_out = self._depth
+        
+        # init params
+        self._init_params(f_h, f_w, c_in, c_out)
+        
+        # return output shape
+        return h_out, w_out, c_out
     
     
     def forward(self, X, **kwargs):
@@ -204,8 +238,6 @@ class Conv2D(Layer):
     
     def _init_padding(self, pad, f_h, f_w):
         """Initialize padding."""
-        
-        self._pad = (0, 0)
         
         if isinstance(pad, int):
             return pad, pad

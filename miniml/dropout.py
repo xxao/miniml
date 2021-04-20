@@ -24,11 +24,11 @@ class Dropout(Layer):
     def __str__(self):
         """Gets string representation."""
         
-        return "Dropout(%.3f)" % self._keep
+        return "Dropout(%.2f)" % self._keep
     
     
-    def reset(self):
-        """Resets params and caches in all layers."""
+    def clear(self):
+        """Clears params and caches."""
         
         self._mask = None
     
