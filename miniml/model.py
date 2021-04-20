@@ -2,6 +2,7 @@
 
 import numpy as np
 from . enums import *
+from . layer import Layer
 from . conv import Conv2D
 from . dense import Dense
 from . dropout import Dropout
@@ -101,7 +102,22 @@ class Model(object):
             dA = layer.backward(dA, lamb=lamb)
     
     
-    def conv2d(self, depth, ksize, stride, pad=SAME, init_method=HE):
+    def add(self, layer):
+        """
+        Appends new layer into model.
+        
+        Args:
+            layer: miniml.Layer
+                Layer to be added.
+        """
+        
+        if not isinstance(layer, Layer):
+            raise TypeError("Layers must be of type miniml.Layer! -> '%s'" % type(layer))
+        
+        self._layers.append(layer)
+    
+    
+    def conv2d(self, depth, ksize, stride, pad=VALID, init_method=HE):
         """
         Appends new 2D convolution layer.
         
@@ -124,8 +140,7 @@ class Model(object):
                 or 'he'.
         """
         
-        layer = Conv2D(depth, ksize, stride, pad, init_method)
-        self._layers.append(layer)
+        self.add(Conv2D(depth, ksize, stride, pad, init_method))
     
     
     def dense(self, nodes, activation=RELU, init_method=HE):
@@ -145,8 +160,7 @@ class Model(object):
                 or 'he'.
         """
         
-        layer = Dense(nodes, activation, init_method)
-        self._layers.append(layer)
+        self.add(Dense(nodes, activation, init_method))
     
     
     def dropout(self, keep):
@@ -158,15 +172,13 @@ class Model(object):
                 Keep probability as %/100.
         """
         
-        layer = Dropout(keep)
-        self._layers.append(layer)
+        self.add(Dropout(keep))
     
     
     def flatten(self):
         """Appends new flattening layer."""
         
-        layer = Flatten()
-        self._layers.append(layer)
+        self.add(Flatten())
     
     
     def pool(self, ksize, stride, mode=MAX):
@@ -184,5 +196,4 @@ class Model(object):
                 Pooling modes such as 'max' or 'avg'.
         """
         
-        layer = Pool(ksize, stride, mode)
-        self._layers.append(layer)
+        self.add(Pool(ksize, stride, mode))
