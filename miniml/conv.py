@@ -309,6 +309,10 @@ class Conv2D(Layer):
             return pad, pad
         
         elif pad == SAME:
+            
+            if not self._ksize[0] % 2 or not self._ksize[1] % 2:
+                raise ValueError("Cannot calculate 'same' padding for even kernel.")
+            
             return (f_h - 1) // 2, (f_w - 1) // 2
         
         return 0, 0
