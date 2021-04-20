@@ -64,9 +64,14 @@ def plot_costs(epochs, **series):
     
     # plot curves
     steps = 1
+    labels = []
     for label, data in series.items():
-        plt.plot(np.squeeze(data), label=label)
+        s, = plt.plot(np.squeeze(data), label=label)
+        labels.append(s)
         steps = int(epochs / len(data))
+    
+    # set legend
+    plt.legend(handles=labels)
     
     # set x-ticks
     locs, labels = plt.xticks()
