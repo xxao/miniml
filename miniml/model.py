@@ -136,7 +136,7 @@ class Model(object):
         self._layers.append(layer)
     
     
-    def conv2d(self, depth, ksize, stride, pad=VALID, init_method=HE):
+    def conv2d(self, depth, ksize, stride, pad=VALID, activation=RELU, init_method=HE):
         """
         Appends new 2D convolution layer.
         
@@ -154,12 +154,16 @@ class Model(object):
                 Initial data padding as a specific number or mode such as
                 'valid' or 'same'.
             
+            activation: str or None
+                Activation function name such as 'sigmoid', 'relu' or 'tanh'.
+                If set to None, activation is not applied.
+            
             init_method: str
                 W parameter initialization method such as 'plain', 'xavier'
                 or 'he'.
         """
         
-        self.add(Conv2D(depth, ksize, stride, pad, init_method))
+        self.add(Conv2D(depth, ksize, stride, pad, activation, init_method))
     
     
     def dense(self, nodes, activation=RELU, init_method=HE):

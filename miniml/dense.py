@@ -29,8 +29,8 @@ class Dense(Layer):
         """
         
         self._nodes = int(nodes)
-        self._init_method = init_method
         self._activation = self._init_activation(activation)
+        self._init_method = init_method
         
         self._X = None
         self._A = None

@@ -2,6 +2,7 @@
 
 import numpy as np
 from . enums import *
+from . activations import *
 from . layer import Layer
 
 
@@ -9,7 +10,7 @@ class Conv2D(Layer):
     """Represents a 2D convolution layer of neural network."""
     
     
-    def __init__(self, depth, ksize, stride, pad=VALID, init_method=PLAIN):
+    def __init__(self, depth, ksize, stride, pad=VALID, activation=RELU, init_method=PLAIN):
         """
         Initializes a new instance of Conv2D.
         
@@ -27,6 +28,10 @@ class Conv2D(Layer):
                 Initial data padding as a specific number or mode such as
                 'valid' or 'same'.
             
+            activation: str or None
+                Activation function name such as 'sigmoid', 'relu' or 'tanh'.
+                If set to None, activation is not applied.
+            
             init_method: str
                 W initialization method name such as 'plain', 'xavier' or 'he'.
         """
@@ -35,9 +40,11 @@ class Conv2D(Layer):
         self._ksize = (ksize, ksize) if isinstance(ksize, int) else ksize
         self._stride = int(stride)
         self._pad = self._init_padding(pad, *self._ksize)
+        self._activation = self._init_activation(activation)
         self._init_method = init_method
         
         self._X = None
+        self._A = None
         
         self._W = None
         self._b = None
@@ -48,7 +55,7 @@ class Conv2D(Layer):
     def __str__(self):
         """Gets string representation."""
         
-        return "Conv2D(%dx%dx%d)" % (self._ksize[0], self._ksize[0], self._depth)
+        return "Conv2D(%dx%dx%d|%s)" % (self._ksize[0], self._ksize[0], self._depth, self._activation)
     
     
     @property
@@ -94,6 +101,7 @@ class Conv2D(Layer):
         """Clears params and caches."""
         
         self._X = None
+        self._A = None
         
         self._W = None
         self._b = None
@@ -159,7 +167,7 @@ class Conv2D(Layer):
             self._init_params(f_h, f_w, c_in, c_out)
         
         # init output
-        output = np.zeros((m, h_out, w_out, c_out))
+        Z = np.zeros((m, h_out, w_out, c_out))
         
         # apply padding
         X_pad = self._zero_pad(X)
@@ -175,9 +183,17 @@ class Conv2D(Layer):
                 w_end = w_start + f_w
                 
                 conv = X_pad[:, h_start:h_end, w_start:w_end, :, np.newaxis] * self._W[np.newaxis, :, :, :]
-                output[:, h, w, :] = np.sum(conv, axis = (1, 2, 3))
+                Z[:, h, w, :] = np.sum(conv, axis = (1, 2, 3))
         
-        return output + self._b
+        # apply biases
+        Z = Z + self._b
+        
+        # apply activation
+        self._A = Z
+        if self._activation is not None:
+            self._A = self._activation.forward(Z)
+        
+        return self._A
     
     
     def backward(self, dA, **kwargs):
@@ -199,13 +215,18 @@ class Conv2D(Layer):
         f_h, f_w = self._ksize
         p_h, p_w = self._pad
         
+        # apply activation
+        dZ = dA
+        if self._activation is not None:
+            dZ = self._activation.backward(self._A, dA)
+        
         # apply padding
         X_pad = self._zero_pad(self._X)
         
         # init output
-        output = np.zeros_like(X_pad)
+        dA = np.zeros_like(X_pad)
         self._dW = np.zeros_like(self._W)
-        self._db = dA.sum(axis=(0, 1, 2)) / m
+        self._db = dZ.sum(axis=(0, 1, 2)) / m
         
         # loop over vertical axis
         for h in range(h_out):
@@ -217,20 +238,20 @@ class Conv2D(Layer):
                 w_start = w * self._stride
                 w_end = w_start + f_w
                 
-                output[:, h_start:h_end, w_start:w_end, :] += np.sum(
+                dA[:, h_start:h_end, w_start:w_end, :] += np.sum(
                     self._W[np.newaxis, :, :, :, :] *
-                    dA[:, h:h+1, w:w+1, np.newaxis, :],
+                    dZ[:, h:h+1, w:w+1, np.newaxis, :],
                     axis = 4)
                 
                 self._dW += np.sum(
                     X_pad[:, h_start:h_end, w_start:w_end, :, np.newaxis] *
-                    dA[:, h:h+1, w:w+1, np.newaxis, :],
+                    dZ[:, h:h+1, w:w+1, np.newaxis, :],
                     axis = 0)
         
         self._dW /= m
-        output = output[:, p_h:p_h+h_in, p_w:p_w+w_in, :]
+        dA = dA[:, p_h:p_h+h_in, p_w:p_w+w_in, :]
         
-        return output
+        return dA
     
     
     def update(self, W, b):
@@ -255,6 +276,30 @@ class Conv2D(Layer):
         return np.pad(x, ((0, 0), (self._pad[0], self._pad[0]), (self._pad[1], self._pad[1]), (0, 0)),
             mode = 'constant',
             constant_values = (0, 0))
+    
+    
+    def _init_activation(self, activation):
+        """Initializes activation function."""
+        
+        if activation is None:
+            return None
+        
+        if isinstance(activation, Activation):
+            return activation
+        
+        if activation == LINEAR:
+            return Linear()
+        
+        if activation == SIGMOID:
+            return Sigmoid()
+        
+        elif activation == RELU:
+            return ReLU()
+        
+        elif activation == TANH:
+            return Tanh()
+        
+        raise ValueError("Unsupported activation function specified! -> '%s" % activation)
     
     
     def _init_padding(self, pad, f_h, f_w):
