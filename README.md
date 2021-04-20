@@ -5,15 +5,15 @@ The *MiniML* is a super basic Python library for machine learning for beginners
 probably it is not even useful for anyone except me. In fact, it is rather my
 small playground, or a way I am trying to learn this very interesting topic.
 Hopefully additional functionality will come as I learn more. Please check
-simple [examples](https://github.com/xxao/miniml/tree/master/examples) to have
-better impression what can be done.
+simple [examples](https://github.com/xxao/miniml/tree/master/examples) to get
+better overview about the library.
 
 ### Example: Non-linear regression
 
 ```python
 import miniml
 import numpy as np
-from utils import plot_costs, plot_regression
+from examples.utils import plot_costs, plot_regression
 
 # Adapted from:
 # https://lucidar.me/en/neural-networks/curve-fitting-nonlinear-regression/
