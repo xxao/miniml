@@ -1,6 +1,5 @@
-from sklearn.datasets import load_iris
 import miniml
-from utils import *
+from sklearn.datasets import load_iris
 
 # load data
 iris = load_iris()
@@ -34,4 +33,5 @@ optimizer = miniml.Adam(
 costs = optimizer.train(model, X, Y, rate)
 
 # plot results
-plot_costs(costs, rate, epochs)
+miniml.print_accuracy(model, X, Y)
+miniml.plot_costs(epochs, costs=costs)

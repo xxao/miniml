@@ -1,5 +1,5 @@
 import miniml
-from utils import *
+import numpy as np
 
 # Adapted from:
 # https://github.com/RafayAK/NothingButNumPy/blob/master/Understanding_and_Creating_NNs/3_layer_toy_network_XOR.ipynb
@@ -39,6 +39,6 @@ optimizer = miniml.GradDescent(
 costs = optimizer.train(model, X, Y, rate)
 
 # plot results
-predict(model, X, Y)
-plot_costs(costs, rate, epochs)
-plot_boundaries(model, X, Y)
+miniml.print_accuracy(model, X, Y)
+miniml.plot_costs(epochs, costs=costs)
+miniml.plot_boundaries(model, X, Y)

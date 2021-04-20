@@ -1,5 +1,5 @@
 import miniml
-from utils import *
+import numpy as np
 
 # Adapted from:
 # https://lucidar.me/en/neural-networks/curve-fitting-nonlinear-regression/
@@ -34,5 +34,5 @@ optimizer = miniml.Adam(
 costs = optimizer.train(model, X, Y, rate)
 
 # plot results
-plot_costs(costs, rate, epochs)
-plot_regression(model, X, Y)
+miniml.plot_costs(epochs, costs=costs)
+miniml.plot_regression(model, X, Y)

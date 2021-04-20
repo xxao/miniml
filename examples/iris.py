@@ -1,6 +1,5 @@
-from sklearn.datasets import load_iris
 import miniml
-from utils import *
+from sklearn.datasets import load_iris
 
 # Adapted from:
 # https://github.com/RafayAK/NothingButNumPy/blob/master/Understanding_and_Creating_Binary_Classification_NNs/3_layer_toy_neural_network_on_iris_sepals.ipynb
@@ -41,6 +40,6 @@ optimizer = miniml.GradDescent(
 costs = optimizer.train(model, X, Y, rate)
 
 # plot results
-predict(model, X, Y)
-plot_costs(costs, rate, epochs)
-plot_boundaries(model, X, Y)
+miniml.print_accuracy(model, X, Y)
+miniml.plot_costs(epochs, costs=costs)
+miniml.plot_boundaries(model, X, Y)

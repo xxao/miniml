@@ -16,3 +16,9 @@ from . pool import Pool, MaxPool, AvgPool
 from . model import Model
 from . optimize import Optimizer, GradDescent, Momentum, RMSprop, Adam, Adagrad
 from . utils import shuffle_data, to_categorical, make_mini_batches
+
+# load plots
+try:
+    from . plots import print_accuracy, plot_costs, plot_boundaries, plot_regression
+except ImportError:
+    pass

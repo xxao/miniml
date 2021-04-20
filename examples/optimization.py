@@ -1,6 +1,6 @@
-import sklearn.datasets
 import miniml
-from utils import *
+import sklearn.datasets
+import numpy as np
 
 # Adapted from DeepLearning.AI
 
@@ -31,6 +31,6 @@ optimizer = miniml.Adam(
 costs = optimizer.train(model, X, Y, rate)
 
 # plot results
-predict(model, X, Y)
-plot_costs(costs, rate, epochs)
-plot_boundaries(model, X, Y)
+miniml.print_accuracy(model, X, Y)
+miniml.plot_costs(epochs, costs=costs)
+miniml.plot_boundaries(model, X, Y)

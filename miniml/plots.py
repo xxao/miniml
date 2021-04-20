@@ -6,8 +6,26 @@ import matplotlib
 import matplotlib.cm
 
 
-def predict(model, X, Y, threshold=0.5):
-    """Predict on test data."""
+def print_accuracy(model, X, Y, threshold=0.5, label="Training"):
+    """
+    Prints accuracy by comparing predicted and expected.
+    
+    Args:
+        model: miniml.Model
+            Trained model.
+        
+        X: np.ndarray
+            Input data of shape (m, ...).
+        
+        Y: np.ndarray
+            Expected output of shape (m, C).
+        
+        threshold: float
+            Threshold to convert probabilities to either 0 or 1.
+        
+        label: str
+            Dataset label.
+    """
     
     # get shape
     m = X.shape[0]
@@ -22,26 +40,36 @@ def predict(model, X, Y, threshold=0.5):
     # calc accuracy
     accuracy = np.sum((p == Y))/m/C * 100
     
-    # print results
-    # print("Predictions: %s" % str(p))
-    print("Accuracy: %.2f %%" % accuracy)
+    # print accuracy
+    print("%s Accuracy: %.2f %%" % (label, accuracy))
 
 
-def plot_costs(costs, rate, epochs):
-    """Plots learning curve of the model."""
+def plot_costs(epochs, **series):
+    """
+    Plots learning curve of the model.
+    
+    Args:
+        epochs: int
+            Number of iterations.
+        
+        *series: list of (float,)
+            Collection of individual series to plot. All the series are expected
+            to have the same length.
+    """
     
     # init plot
     plt.figure()
-    plt.title("Learning rate: " + str(rate))
-    plt.ylabel('Cost')
-    plt.xlabel('Iterations ')
+    plt.title("Learning Curve")
+    plt.xlabel('Iterations')
     
-    # plot curve
-    plt.plot(np.squeeze(costs))
+    # plot curves
+    steps = 1
+    for label, data in series.items():
+        plt.plot(np.squeeze(data), label=label)
+        steps = int(epochs / len(data))
     
     # set x-ticks
     locs, labels = plt.xticks()
-    steps = int(epochs / len(costs))
     plt.xticks(locs[1:-1], tuple(np.array(locs[1:-1], dtype='int')*steps))
     plt.xticks()
     
@@ -50,8 +78,31 @@ def plot_costs(costs, rate, epochs):
 
 
 def plot_boundaries(model, X, Y, threshold=0.5):
-    """Plots decision boundaries."""
+    """
+    Plots decision boundaries for 2D data.
     
+    Args:
+        model: miniml.Model
+            Trained model.
+        
+        X: np.ndarray
+            Input data of shape (m, 2).
+        
+        Y: np.ndarray
+            Expected output of shape (m, C).
+        
+        threshold: float
+            Threshold to convert probabilities to either 0 or 1.
+    """
+    
+    # check data
+    if len(X.shape) != 2 or X.shape[1] != 2:
+        raise ValueError("Input data (X) should be of shape (m, 2).")
+    
+    if len(Y.shape) != 2:
+        raise ValueError("Expected output data (Y) should be of shape (m, C).")
+    
+    # get size
     NX = 1000
     NY = 1000
     C = Y.shape[1]
@@ -114,11 +165,30 @@ def plot_boundaries(model, X, Y, threshold=0.5):
 
 
 def plot_regression(model, X, Y):
-    """Plots regression fit."""
+    """
+    Plots regression fit for 2D data.
+    
+    Args:
+        model: miniml.Model
+            Trained model.
+        
+        X: np.ndarray
+            X-axis data of shape (m,).
+        
+        Y: np.ndarray
+            Y-axis data of shape (m,).
+    """
+    
+    # check data
+    if len(X.shape) != 2 or X.shape[1] != 1:
+        raise ValueError("X-axis data (X) should be of shape (m, 1).")
+    
+    if len(Y.shape) != 2 or Y.shape[1] != 1:
+        raise ValueError("Y-axis data (Y) should be of shape (m, 1).")
     
     # init plot
     plt.figure()
-    plt.title('Fit')
+    plt.title('Regression Fit')
     plt.xlabel('x')
     plt.ylabel('y')
     
