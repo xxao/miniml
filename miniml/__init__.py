@@ -14,7 +14,7 @@ from . dropout import Dropout
 from . flatten import Flatten
 from . pool import Pool, MaxPool, AvgPool
 from . model import Model
-from . optimize import Optimizer, GradDescent, Momentum, RMSprop, Adam, Adagrad
+from . optimizers import Optimizer, GradDescent, Momentum, RMSprop, Adam, Adagrad
 from . utils import shuffle_data, to_categorical, make_mini_batches
 
 # load plots
