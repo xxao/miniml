@@ -4,6 +4,7 @@ import numpy as np
 from . enums import *
 from . activations import *
 from . layer import Layer
+from . utils import *
 
 
 class Conv2D(Layer):
@@ -158,34 +159,18 @@ class Conv2D(Layer):
         # get dimensions
         m, h_in, w_in, c_in = X.shape
         f_h, f_w = self._ksize
-        s_h, s_w = self._stride
         h_out, w_out, c_out = self.outshape(X.shape[1:])
         
         # init params
         if self._W is None:
             self._init_params(f_h, f_w, c_in, c_out)
         
-        # init output
-        Z = np.zeros((m, h_out, w_out, c_out))
-        
-        # apply padding
-        X_pad = self._zero_pad(X)
-        
-        # loop over vertical axis
-        for h in range(h_out):
-            h_start = h * s_h
-            h_end = h_start + f_h
-            
-            # loop over horizontal axis
-            for w in range(w_out):
-                w_start = w * s_w
-                w_end = w_start + f_w
-                
-                conv = X_pad[:, h_start:h_end, w_start:w_end, :, np.newaxis] * self._W[np.newaxis, :, :, :]
-                Z[:, h, w, :] = np.sum(conv, axis = (1, 2, 3))
-        
-        # apply biases
-        Z = Z + self._b
+        # apply convolution
+        self._cols = im2col(np.moveaxis(X, -1, 1), self._ksize, self._pad, self._stride)
+        W = np.transpose(self._W, (3, 2, 0, 1))
+        result = W.reshape((c_out, -1)).dot(self._cols)
+        output = result.reshape(c_out, h_out, w_out, m)
+        Z = output.transpose(3, 1, 2, 0) + self._b
         
         # apply activation
         self._A = Z
@@ -209,50 +194,21 @@ class Conv2D(Layer):
         """
         
         # get dimensions
-        m, h_in, w_in, c_in = self._X.shape
         m, h_out, w_out, c_out = dA.shape
-        f_h, f_w = self._ksize
-        p_t, p_b, p_l, p_r = self._pad
-        s_h, s_w = self._stride
         
-        # apply activation
-        dZ = dA
-        if self._activation is not None:
-            dZ = self._activation.backward(self._A, dA)
+        # calc gradients
+        self._db = dA.sum(axis=(0, 1, 2)) / m
+        dA_reshaped = dA.transpose(3, 1, 2, 0).reshape(c_out, -1)
+        W = np.transpose(self._W, (3, 2, 0, 1))
+        dW = dA_reshaped.dot(self._cols.T).reshape(W.shape)
+        self._dW = np.transpose(dW, (2, 3, 1, 0)) / m
         
-        # apply padding
-        X_pad = self._zero_pad(self._X)
+        # apply convolution
+        cols = W.reshape(c_out, -1).T.dot(dA_reshaped)
+        output = col2im(cols, np.moveaxis(self._X, -1, 1).shape, self._ksize, self._pad, self._stride)
+        output = np.transpose(output, (0, 2, 3, 1))
         
-        # init output
-        dA = np.zeros_like(X_pad)
-        self._dW = np.zeros_like(self._W)
-        self._db = dZ.sum(axis=(0, 1, 2)) / m
-        
-        # loop over vertical axis
-        for h in range(h_out):
-            h_start = h * s_h
-            h_end = h_start + f_h
-            
-            # loop over horizontal axis
-            for w in range(w_out):
-                w_start = w * s_w
-                w_end = w_start + f_w
-                
-                dA[:, h_start:h_end, w_start:w_end, :] += np.sum(
-                    self._W[np.newaxis, :, :, :, :] *
-                    dZ[:, h:h+1, w:w+1, np.newaxis, :],
-                    axis = 4)
-                
-                self._dW += np.sum(
-                    X_pad[:, h_start:h_end, w_start:w_end, :, np.newaxis] *
-                    dZ[:, h:h+1, w:w+1, np.newaxis, :],
-                    axis = 0)
-        
-        # finalize dW, dA
-        self._dW /= m
-        dA = dA[:, p_t:p_t+h_in, p_l:p_l+w_in, :]
-        
-        return dA
+        return output
     
     
     def update(self, W, b):

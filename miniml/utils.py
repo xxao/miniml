@@ -121,3 +121,121 @@ def make_mini_batches(X, Y, size=64, seed=None):
         batches.append((batch_X, batch_Y))
     
     return batches
+
+
+def im2col_idxs(shape, kernel, pad, stride):
+    """
+    Adapted from Stamford CS231N course: https://cs231n.github.io/
+    
+    Args:
+        shape: (int, int, int)
+            Input shape as (m, c_in, h_in, w_in).
+        
+        kernel: (int, int)
+            Filter kernel size as (f_h, f_w)
+        
+        pad: (int, int, int, int)
+            Padding as (p_t, p_b, p_l, p_r).
+        
+        stride: (int, int)
+            Stride as (s_h, s_w).
+    """
+    
+    m, c_in, h_in, w_in = shape
+    f_h, f_w = kernel
+    p_t, p_b, p_l, p_r = pad
+    s_h, s_w = stride
+    
+    h_out = (h_in + p_t + p_b - f_h) // s_h + 1
+    w_out = (w_in + p_l + p_r - f_w) // s_w + 1
+
+    i0 = np.repeat(np.arange(f_h), f_w)
+    i0 = np.tile(i0, c_in)
+    i1 = s_h * np.repeat(np.arange(h_out), w_out)
+    
+    j0 = np.tile(np.arange(f_w), f_h * c_in)
+    j1 = s_w * np.tile(np.arange(w_out), h_out)
+    
+    i = i0.reshape(-1, 1) + i1.reshape(1, -1)
+    j = j0.reshape(-1, 1) + j1.reshape(1, -1)
+    k = np.repeat(np.arange(c_in), f_h * f_w).reshape(-1, 1)
+    
+    return k, i, j
+
+
+def im2col(X, kernel, pad, stride):
+    """
+    Adapted from Stamford CS231N course: https://cs231n.github.io/
+    
+    Args:
+        X: np.array
+            Input of shape (m, c_in, h_in, w_in).
+        
+        kernel: (int, int)
+            Filter kernel size as (f_h, f_w)
+        
+        pad: (int, int, int, int)
+            Padding as (p_t, p_b, p_l, p_r).
+        
+        stride: (int, int)
+            Stride as (s_h, s_w).
+    
+    Returns:
+        (f_h * f_w * c_in, h_out, w_out * m)
+    """
+    
+    m, c_in, h_in, w_in = X.shape
+    f_h, f_w = kernel
+    p_t, p_b, p_l, p_r = pad
+    
+    padded = np.pad(
+        array = X,
+        pad_width = ((0, 0), (0, 0), (p_t, p_b), (p_l, p_r)),
+        mode = 'constant')
+    
+    k, i, j = im2col_idxs(X.shape, kernel, pad, stride)
+    cols = padded[:, k, i, j]
+    cols = cols.transpose(1, 2, 0).reshape(f_h * f_w * c_in, -1)
+    
+    return cols
+
+
+def col2im(cols, shape, kernel, pad, stride):
+    """
+    Adapted from Stamford CS231N course: https://cs231n.github.io/
+    
+    Args:
+        cols:
+            (f_h * f_w * c_in, h_out, w_out * m)
+        
+        shape: (int, int, int)
+            Input shape as (m, c_in, h_in, w_in).
+        
+        kernel: (int, int)
+            Filter kernel size as (f_h, f_w)
+        
+        pad: (int, int, int, int)
+            Padding as (p_t, p_b, p_l, p_r).
+        
+        stride: (int, int)
+            Stride as (s_h, s_w).
+    
+    Returns:
+        (m, c_in, h_in, w_in)
+    """
+    
+    m, c_in, h_in, w_in = shape
+    f_h, f_w = kernel
+    p_t, p_b, p_l, p_r = pad
+    p_h = h_in + p_t + p_b
+    p_w = w_in + p_l + p_r
+    
+    padded = np.zeros((m, c_in, p_h, p_w), dtype=cols.dtype)
+    k, i, j = im2col_idxs(shape, kernel, pad, stride)
+    
+    cols_reshaped = cols.reshape(c_in * f_h * f_w, -1, m)
+    cols_reshaped = cols_reshaped.transpose(2, 0, 1)
+    np.add.at(padded, (slice(None), k, i, j), cols_reshaped)
+    output = padded[:, :, p_t:p_t+h_in, p_l:p_l+w_in]
+    
+    return output
