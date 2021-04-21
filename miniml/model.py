@@ -212,8 +212,8 @@ class Model(object):
             ksize: int or (int, int)
                 Size of the kernel as (h, w) or single integer if squared.
             
-            stride: int
-                Single step kernel shift.
+            stride: int or (int, int)
+                Single step kernel shift as single value or (s_h, s_w).
             
             mode: str
                 Pooling modes such as 'max' or 'avg'.

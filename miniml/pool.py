@@ -17,8 +17,8 @@ class Pool(Layer):
             ksize: int or (int, int)
                 Size of the kernel as (h, w) or single integer if squared.
             
-            stride: int
-                Single step kernel shift.
+            stride: int or (int, int)
+                Single step kernel shift as single value or (s_h, s_w).
             
             mode: str
                 Pooling modes such as 'max' or 'avg'.
@@ -26,7 +26,7 @@ class Pool(Layer):
         
         self._mode = mode
         self._ksize = (ksize, ksize) if isinstance(ksize, int) else ksize
-        self._stride = int(stride)
+        self._stride = (stride, stride) if isinstance(stride, int) else stride
         
         self._X = None
     
@@ -54,8 +54,9 @@ class Pool(Layer):
         
         h_in, w_in, c_in = shape
         f_h, f_w = self._ksize
-        h_out = int(1 + (h_in - f_h) / self._stride)
-        w_out = int(1 + (w_in - f_w) / self._stride)
+        s_h, s_w = self._stride
+        h_out = int(1 + (h_in - f_h) / s_h)
+        w_out = int(1 + (w_in - f_w) / s_w)
         c_out = c_in
         
         return h_out, w_out, c_out
@@ -84,22 +85,21 @@ class Pool(Layer):
         
         # get dimensions
         m, h_in, w_in, c_in = X.shape
+        h_out, w_out, c_out = self.outshape(X.shape[1:])
         f_h, f_w = self._ksize
-        h_out = int(1 + (h_in - f_h) / self._stride)
-        w_out = int(1 + (w_in - f_w) / self._stride)
-        c_out = c_in
+        s_h, s_w = self._stride
         
         # init output
         output = np.zeros((m, h_out, w_out, c_out))
         
         # loop over vertical axis
         for h in range(h_out):
-            h_start = h * self._stride
+            h_start = h * s_h
             h_end = h_start + f_h
             
             # loop over horizontal axis
             for w in range(w_out):
-                w_start = w * self._stride
+                w_start = w * s_w
                 w_end = w_start + f_w
                 
                 # get slice
@@ -130,8 +130,9 @@ class Pool(Layer):
         """
         
         # get dimensions
-        f_h, f_w = self._ksize
         m, h_out, w_out, c_out = dA.shape
+        f_h, f_w = self._ksize
+        s_h, s_w = self._stride
         
         # init output
         output = np.zeros(self._X.shape)
@@ -141,12 +142,12 @@ class Pool(Layer):
             
             # loop over vertical axis
             for h in range(h_out):
-                h_start = h * self._stride
+                h_start = h * s_h
                 h_end = h_start + f_h
                 
                 # loop over horizontal axis
                 for w in range(w_out):
-                    w_start = w * self._stride
+                    w_start = w * s_w
                     w_end = w_start + f_w
                     
                     # loop over channels
