@@ -46,6 +46,7 @@ class Conv2D(Layer):
         
         self._X = None
         self._A = None
+        self._cols = None
         
         self._W = None
         self._b = None
@@ -104,6 +105,7 @@ class Conv2D(Layer):
         
         self._X = None
         self._A = None
+        self._cols = None
         
         self._W = None
         self._b = None
@@ -158,19 +160,20 @@ class Conv2D(Layer):
         
         # get dimensions
         m, h_in, w_in, c_in = X.shape
-        f_h, f_w = self._ksize
         h_out, w_out, c_out = self.outshape(X.shape[1:])
+        f_h, f_w = self._ksize
         
         # init params
         if self._W is None:
             self._init_params(f_h, f_w, c_in, c_out)
         
         # apply convolution
-        self._cols = im2col(np.moveaxis(X, -1, 1), self._ksize, self._pad, self._stride)
-        W = np.transpose(self._W, (3, 2, 0, 1))
-        result = W.reshape((c_out, -1)).dot(self._cols)
-        output = result.reshape(c_out, h_out, w_out, m)
-        Z = output.transpose(3, 1, 2, 0) + self._b
+        X = X.transpose(0, 3, 1, 2)
+        self._cols = im2col(X, self._ksize, self._pad, self._stride)
+        W = self._W.transpose(3, 2, 0, 1)
+        Z = W.reshape((c_out, -1)).dot(self._cols)
+        Z = Z.reshape(c_out, h_out, w_out, m)
+        Z = Z.transpose(3, 1, 2, 0) + self._b
         
         # apply activation
         self._A = Z
@@ -196,19 +199,24 @@ class Conv2D(Layer):
         # get dimensions
         m, h_out, w_out, c_out = dA.shape
         
+        # apply activation
+        dZ = dA
+        if self._activation is not None:
+            dZ = self._activation.backward(self._A, dA)
+        
         # calc gradients
-        self._db = dA.sum(axis=(0, 1, 2)) / m
-        dA_reshaped = dA.transpose(3, 1, 2, 0).reshape(c_out, -1)
+        self._db = dZ.sum(axis=(0, 1, 2)) / m
+        dZ = dZ.transpose(3, 1, 2, 0).reshape(c_out, -1)
         W = np.transpose(self._W, (3, 2, 0, 1))
-        dW = dA_reshaped.dot(self._cols.T).reshape(W.shape)
+        dW = dZ.dot(self._cols.T).reshape(W.shape)
         self._dW = np.transpose(dW, (2, 3, 1, 0)) / m
         
-        # apply convolution
-        cols = W.reshape(c_out, -1).T.dot(dA_reshaped)
-        output = col2im(cols, np.moveaxis(self._X, -1, 1).shape, self._ksize, self._pad, self._stride)
-        output = np.transpose(output, (0, 2, 3, 1))
+        # apply reversed convolution
+        cols = W.reshape(c_out, -1).T.dot(dZ)
+        dX = col2im(cols, np.moveaxis(self._X, -1, 1).shape, self._ksize, self._pad, self._stride)
+        dX = np.transpose(dX, (0, 2, 3, 1))
         
-        return output
+        return dX
     
     
     def update(self, W, b):

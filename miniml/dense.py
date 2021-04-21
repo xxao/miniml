@@ -190,9 +190,9 @@ class Dense(Layer):
         self._dW = (1 / m) * np.dot(dZ.T, self._X) + (lamb / m) * self._W
         self._db = (1 / m) * np.sum(dZ, axis=0, keepdims=True)
         
-        dA = np.dot(dZ, self._W)
+        dX = np.dot(dZ, self._W)
         
-        return dA
+        return dX
     
     
     def update(self, W, b):

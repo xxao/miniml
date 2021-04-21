@@ -73,7 +73,7 @@ class Dropout(Layer):
         if self._keep == 1:
             return dA
         
-        dA = np.multiply(dA, self._mask)
-        dA = dA / self._keep
+        dX = np.multiply(dA, self._mask)
+        dX = dX / self._keep
         
-        return dA
+        return dX
