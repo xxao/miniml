@@ -12,7 +12,7 @@ from . conv import Conv2D
 from . dense import Dense
 from . dropout import Dropout
 from . flatten import Flatten
-from . pool import Pool, MaxPool, AvgPool
+from . pool import MaxPool
 from . model import Model
 from . optimizers import Optimizer, GradDescent, Momentum, RMSprop, Adam, Adagrad
 from . utils import shuffle_data, to_categorical, make_mini_batches

@@ -7,7 +7,7 @@ from . conv import Conv2D
 from . dense import Dense
 from . dropout import Dropout
 from . flatten import Flatten
-from . pool import Pool
+from . pool import MaxPool
 
 
 class Model(object):
@@ -204,9 +204,9 @@ class Model(object):
         self.add(Flatten())
     
     
-    def pool(self, ksize, stride, mode=MAX):
+    def maxpool(self, ksize, stride):
         """
-        Appends new pooling layer.
+        Appends new max-pooling layer.
         
         Args:
             ksize: int or (int, int)
@@ -214,9 +214,6 @@ class Model(object):
             
             stride: int or (int, int)
                 Single step kernel shift as single value or (s_h, s_w).
-            
-            mode: str
-                Pooling modes such as 'max' or 'avg'.
         """
         
-        self.add(Pool(ksize, stride, mode))
+        self.add(MaxPool(ksize, stride))
