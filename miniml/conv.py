@@ -10,7 +10,7 @@ class Conv2D(Layer):
     """Represents a 2D convolution layer of neural network."""
     
     
-    def __init__(self, depth, ksize, stride, pad=VALID, activation=RELU, init_method=PLAIN):
+    def __init__(self, depth, ksize, stride=1, pad=VALID, activation=RELU, init_method=PLAIN):
         """
         Initializes a new instance of Conv2D.
         
@@ -21,8 +21,8 @@ class Conv2D(Layer):
             ksize: int or (int, int)
                 Size of the kernel as (n_h, n_w) or single integer if squared.
             
-            stride: int
-                Single step kernel shift.
+            stride: int or (int, int)
+                Single step kernel shift as single value or (s_h, s_w).
             
             pad: str, int, (int, int) or (int, int, int, int)
                 Initial data padding as 'valid' or 'same' mode or direct values
@@ -38,7 +38,7 @@ class Conv2D(Layer):
         
         self._depth = int(depth)
         self._ksize = (ksize, ksize) if isinstance(ksize, int) else ksize
-        self._stride = int(stride)
+        self._stride = (stride, stride) if isinstance(stride, int) else stride
         self._pad = self._init_padding(pad, *self._ksize)
         self._activation = self._init_activation(activation)
         self._init_method = init_method
@@ -90,8 +90,9 @@ class Conv2D(Layer):
         h_in, w_in, c_in = shape
         f_h, f_w = self._ksize
         p_t, p_b, p_l, p_r = self._pad
-        h_out = int(1 + (h_in - f_h + p_t + p_b) / self._stride)
-        w_out = int(1 + (w_in - f_w + p_l + p_r) / self._stride)
+        s_h, s_w = self._stride
+        h_out = int(1 + (h_in - f_h + p_t + p_b) / s_h)
+        w_out = int(1 + (w_in - f_w + p_l + p_r) / s_w)
         c_out = self._depth
         
         return h_out, w_out, c_out
@@ -157,10 +158,8 @@ class Conv2D(Layer):
         # get dimensions
         m, h_in, w_in, c_in = X.shape
         f_h, f_w = self._ksize
-        p_t, p_b, p_l, p_r = self._pad
-        h_out = int(1 + (h_in - f_h + p_t + p_b) / self._stride)
-        w_out = int(1 + (w_in - f_w + p_l + p_r) / self._stride)
-        c_out = self._depth
+        s_h, s_w = self._stride
+        h_out, w_out, c_out = self.outshape(X.shape[1:])
         
         # init params
         if self._W is None:
@@ -174,12 +173,12 @@ class Conv2D(Layer):
         
         # loop over vertical axis
         for h in range(h_out):
-            h_start = h * self._stride
+            h_start = h * s_h
             h_end = h_start + f_h
             
             # loop over horizontal axis
             for w in range(w_out):
-                w_start = w * self._stride
+                w_start = w * s_w
                 w_end = w_start + f_w
                 
                 conv = X_pad[:, h_start:h_end, w_start:w_end, :, np.newaxis] * self._W[np.newaxis, :, :, :]
@@ -214,6 +213,7 @@ class Conv2D(Layer):
         m, h_out, w_out, c_out = dA.shape
         f_h, f_w = self._ksize
         p_t, p_b, p_l, p_r = self._pad
+        s_h, s_w = self._stride
         
         # apply activation
         dZ = dA
@@ -230,12 +230,12 @@ class Conv2D(Layer):
         
         # loop over vertical axis
         for h in range(h_out):
-            h_start = h * self._stride
+            h_start = h * s_h
             h_end = h_start + f_h
             
             # loop over horizontal axis
             for w in range(w_out):
-                w_start = w * self._stride
+                w_start = w * s_w
                 w_end = w_start + f_w
                 
                 dA[:, h_start:h_end, w_start:w_end, :] += np.sum(
@@ -248,6 +248,7 @@ class Conv2D(Layer):
                     dZ[:, h:h+1, w:w+1, np.newaxis, :],
                     axis = 0)
         
+        # finalize dW, dA
         self._dW /= m
         dA = dA[:, p_t:p_t+h_in, p_l:p_l+w_in, :]
         

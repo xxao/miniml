@@ -147,8 +147,8 @@ class Model(object):
             ksize: int or (int, int)
                 Size of the kernel as (n_h, n_w) or single integer if squared.
             
-            stride: int
-                Single step kernel shift.
+            stride: int or (int, int)
+                Single step kernel shift as single value or (s_h, s_w).
             
             pad: str, int, (int, int) or (int, int, int, int)
                 Initial data padding as 'valid' or 'same' mode or direct values
