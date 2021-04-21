@@ -28,7 +28,7 @@ optimizer = miniml.Adam(
     epochs = epochs,
     batch_size = 16,
     batch_seed = 3,
-    init_seed = 48,
+    init_seed = 42,
     store = 1,
     verbose = 1)
 
