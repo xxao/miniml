@@ -4,7 +4,7 @@ import scipy.io
 # Adapted from DeepLearning.AI
 
 # load data
-data = scipy.io.loadmat('../datasets/data.mat')
+data = scipy.io.loadmat('../datasets/regularization.mat')
 X = data['X']
 Y = data['y']
 
