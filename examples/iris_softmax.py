@@ -13,15 +13,15 @@ C = len(cats)
 # shuffle data
 X, Y = miniml.shuffle_data(X, Y, seed=48)
 
-# init params
-rate = 0.01
-epochs = 5000
-batch_size = 40
-
 # create model
 model = miniml.Model()
 model.dense(5, 'relu', 'he')
 model.dense(3, 'softmax', 'plain')
+
+# init params
+rate = 0.01
+epochs = 5000
+batch_size = 40
 
 # train model
 optimizer = miniml.Adam(

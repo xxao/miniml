@@ -19,15 +19,15 @@ Y = np.array([
     [0]
 ])
 
-# init params
-rate = 1
-epochs = 20000
-
 # create model
 model = miniml.Model()
 model.dense(5, 'sigmoid', 'xavier')
 model.dense(3, 'sigmoid', 'xavier')
 model.dense(1, 'sigmoid', 'xavier')
+
+# init params
+rate = 1
+epochs = 20000
 
 # train model
 # note that original implementation is without averaging across examples in LinearLayer.backward(...)

@@ -8,16 +8,16 @@ np.random.seed(3)
 X, Y = sklearn.datasets.make_moons(n_samples=300, noise=.2)
 Y = Y.reshape((len(Y), 1))
 
-# init params
-rate = 0.0007
-epochs = 10000
-batch_size = 64
-
 # init model
 model = miniml.Model()
 model.dense(5, 'relu', 'he')
 model.dense(2, 'relu', 'he')
 model.dense(1, 'sigmoid', 'he')
+
+# init params
+rate = 0.0007
+epochs = 10000
+batch_size = 64
 
 # train model (try different optimizers)
 optimizer = miniml.Adam(

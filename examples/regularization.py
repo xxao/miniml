@@ -8,16 +8,16 @@ data = scipy.io.loadmat('../datasets/regularization.mat')
 X = data['X']
 Y = data['y']
 
-# init params
-rate = 0.3
-epochs = 30000
-lamb = 0.7
-
 # init model
 model = miniml.Model()
 model.dense(20, 'relu', 'xavier')
 model.dense(3, 'relu', 'xavier')
 model.dense(1, 'sigmoid', 'xavier')
+
+# init params
+rate = 0.3
+epochs = 30000
+lamb = 0.7
 
 # train model
 optimizer = miniml.GradDescent(

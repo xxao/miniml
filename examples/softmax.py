@@ -33,14 +33,14 @@ y = np.array([0, 0, 1, 0, 2, 1, 1, 1, 1, 0, 0, 2, 2, 2, 1, 0, 1, 2, 2, 2])
 Y, cats = miniml.to_categorical(y)
 C = len(cats)
 
-# init params
-rate = 2
-epochs = 40
-
 # create model
 model = miniml.Model()
 # model.dense(32, 'relu', 'he')
 model.dense(C, 'softmax', 'plain')
+
+# init params
+rate = 2
+epochs = 40
 
 # train model
 optimizer = miniml.GradDescent(

@@ -9,15 +9,15 @@ np.random.seed(1)
 X, Y = sklearn.datasets.make_circles(n_samples=300, noise=.05)
 Y = Y.reshape((len(Y), 1))
 
-# init params
-rate = 0.01
-epochs = 15000
-
 # init model
 model = miniml.Model()
 model.dense(10, 'relu', 'he')
 model.dense(5, 'relu', 'he')
 model.dense(1, 'sigmoid', 'he')
+
+# init params
+rate = 0.01
+epochs = 15000
 
 # train model
 optimizer = miniml.GradDescent(

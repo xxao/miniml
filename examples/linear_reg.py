@@ -12,13 +12,13 @@ Y = 0.6 * X + 2 + np.random.normal(size=500)
 X = X.reshape((len(X), 1))
 Y = Y.reshape((len(Y), 1))
 
-# init params
-rate = 1
-epochs = 2000
-
 # create model
 model = miniml.Model()
 model.dense(1, 'linear', 'plain')
+
+# init params
+rate = 1
+epochs = 2000
 
 # train model
 optimizer = miniml.GradDescent(

@@ -12,16 +12,16 @@ Y = 0.1*X*np.cos(X) + 0.1*np.random.normal(size=1000)
 X = X.reshape((len(X), 1))
 Y = Y.reshape((len(Y), 1))
 
-# init params
-rate = 0.01
-epochs = 1000
-
 # create model
 model = miniml.Model()
 model.dense(1, 'linear', 'plain')
 model.dense(64, 'relu', 'he')
 model.dense(32, 'relu', 'he')
 model.dense(1, 'linear', 'plain')
+
+# init params
+rate = 0.01
+epochs = 1000
 
 # train model
 optimizer = miniml.Adam(

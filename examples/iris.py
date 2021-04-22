@@ -19,15 +19,15 @@ X, Y = miniml.shuffle_data(X, Y, seed=48)
 # make the target label virginica = 1 and the rest 0
 Y = (Y == 2).astype('int')
 
-# init params
-rate = 1
-epochs = 5000
-
 # create model
 model = miniml.Model()
 model.dense(5, 'sigmoid', 'xavier')
 model.dense(3, 'sigmoid', 'xavier')
 model.dense(1, 'sigmoid', 'xavier')
+
+# init params
+rate = 1
+epochs = 5000
 
 # train model
 # note that original implementation is without averaging across examples in LinearLayer.backward(...)
