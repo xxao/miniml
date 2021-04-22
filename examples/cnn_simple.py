@@ -21,7 +21,7 @@ model.dense(1, 'sigmoid', 'plain')
 
 # init params
 rate = 0.001
-epochs = 5
+epochs = 10
 
 optimizer = miniml.Adam(
     cost = 'bce',

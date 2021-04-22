@@ -10,6 +10,8 @@ from . utils import *
 class Conv2D(Layer):
     """Represents a 2D convolution layer of neural network."""
     
+    OPTIMIZE = True
+    
     
     def __init__(self, depth, ksize, stride=1, pad=VALID, activation=RELU, init_method=PLAIN):
         """
@@ -72,6 +74,20 @@ class Conv2D(Layer):
         """Gets current biases."""
         
         return self._b
+    
+    
+    @property
+    def dW(self):
+        """Gets current weights gradients."""
+        
+        return self._dW
+    
+    
+    @property
+    def db(self):
+        """Gets current biases gradients."""
+        
+        return self._db
     
     
     def outshape(self, shape):
