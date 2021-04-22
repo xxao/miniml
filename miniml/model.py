@@ -245,8 +245,9 @@ class Model(object):
             ksize: int or (int, int)
                 Size of the kernel as (h, w) or single integer if squared.
             
-            stride: int or (int, int)
-                Single step kernel shift as single value or (s_h, s_w).
+            stride: int or (int, int) or None
+                Single step kernel shift as single value or (s_h, s_w). If set
+                to None, full kernel size is used.
         """
         
         self.add(MaxPool(ksize, stride))

@@ -9,7 +9,7 @@ class MaxPool(Layer):
     """Represents a max-pooling layer of neural network."""
     
     
-    def __init__(self, ksize, stride):
+    def __init__(self, ksize, stride=None):
         """
         Initializes a new instance of Pool.
         
@@ -17,13 +17,19 @@ class MaxPool(Layer):
             ksize: int or (int, int)
                 Size of the kernel as (h, w) or single integer if squared.
             
-            stride: int or (int, int)
-                Single step kernel shift as single value or (s_h, s_w).
+            stride: int or (int, int) or None
+                Single step kernel shift as single value or (s_h, s_w). If set
+                to None, full kernel size is used.
         """
         
         self._ksize = (ksize, ksize) if isinstance(ksize, int) else ksize
-        self._stride = (stride, stride) if isinstance(stride, int) else stride
         self._pad = (0, 0, 0, 0)
+        self._stride = stride
+        
+        if stride is None:
+            self._stride = tuple(self._ksize)
+        elif isinstance(stride, int):
+            self._stride = (stride, stride)
         
         self._X_shape = None
         self._cols = None
