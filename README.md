@@ -1,10 +1,11 @@
 # MiniML
 
 The *MiniML* is a super basic Python library for machine learning for beginners
-(as I am). It is by no means meant as a  stable, production platform, and most
+(as I am). It is by no means meant as a stable, production platform, and most
 probably it is not even useful for anyone except me. In fact, it is rather my
 small playground, or a way I am trying to learn this very interesting topic.
-Hopefully additional functionality will come as I learn more. Please check
+By intention, I programmed it more didactic and naive, therefore it is very
+slow. Hopefully additional functionality will come as I learn more. Please check
 simple [examples](https://github.com/xxao/miniml/tree/master/examples) to get
 better overview about the library.
 
@@ -31,6 +32,9 @@ model.dense(1, 'linear', 'plain')
 model.dense(64, 'relu', 'he')
 model.dense(32, 'relu', 'he')
 model.dense(1, 'linear', 'plain')
+
+# show model summary
+model.summary(X.shape[1:])
 
 # init params
 rate = 0.01
