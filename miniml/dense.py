@@ -93,6 +93,31 @@ class Dense(Layer):
         return (self._nodes, )
     
     
+    def params(self, shape):
+        """
+        Calculates number of trainable params.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            int
+                Number of trainable params.
+        """
+        
+        # get dimensions
+        n_in = shape[0]
+        n_out = self._nodes
+        
+        # count params
+        w = n_in * n_out
+        b = n_out
+        
+        return w + b
+    
+    
     def clear(self):
         """Clears params and caches."""
         

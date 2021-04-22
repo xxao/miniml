@@ -40,6 +40,39 @@ class Model(object):
         return tuple(self._layers)
     
     
+    def summary(self, shape):
+        """
+        Prints model summary.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        """
+        
+        length = 81
+        
+        print()
+        print("=" * length)
+        print(f" {'Layer':<30} | {'Output':<25} | {'Params':>18}")
+        print("-" * length)
+        
+        total_params = 0
+        for layer in self._layers:
+            
+            params = layer.params(shape)
+            total_params += params
+            
+            shape = layer.outshape(shape)
+            full_shape = (None, *shape)
+            
+            print(f" {str(layer):<30} | {str(full_shape):<25} | {params:>18,}")
+        
+        print("-" * length)
+        print(f"{'Total':>59} | {total_params:>18,}")
+        print("=" * length)
+    
+    
     def clear(self):
         """Resets params and caches in all layers."""
         

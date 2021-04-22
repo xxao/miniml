@@ -31,6 +31,23 @@ class Layer(object):
         return shape
     
     
+    def params(self, shape):
+        """
+        Calculates number of trainable params.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            int
+                Number of trainable params.
+        """
+        
+        return 0
+    
+    
     def clear(self):
         """Clears params and caches."""
         

@@ -116,6 +116,32 @@ class Conv2D(Layer):
         return h_out, w_out, c_out
     
     
+    def params(self, shape):
+        """
+        Calculates number of trainable params.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            int
+                Number of trainable params.
+        """
+        
+        # get dimensions
+        h_in, w_in, c_in = shape
+        f_h, f_w = self._ksize
+        h_out, w_out, c_out = self.outshape(shape)
+        
+        # count params
+        w = f_h * f_w * c_in * c_out
+        b = c_out
+        
+        return w + b
+    
+    
     def clear(self):
         """Clears params and caches."""
         
