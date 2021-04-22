@@ -9,6 +9,7 @@ HE = 'he'
 LINEAR = 'linear'
 SIGMOID = 'sigmoid'
 RELU = 'relu'
+LRELU = 'lrelu'
 TANH = 'tanh'
 SOFTMAX = 'softmax'
 

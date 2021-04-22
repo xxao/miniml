@@ -81,6 +81,27 @@ class ReLU(Activation):
         return dZ
 
 
+class LeakyReLU(Activation):
+    """Represents a LeakyReLU activation function."""
+    
+    ALPHA = 0.01
+    
+    def forward(self, Z):
+        """Performs forward propagation through activation function."""
+        
+        A = np.array(Z, copy=True)
+        A[A < 0] = A[A < 0] * self.ALPHA
+        return A
+    
+    
+    def backward(self, A, dA):
+        """Performs backward propagation through activation function."""
+        
+        dZ = np.ones_like(A)
+        dZ[A < 0] *= self.ALPHA
+        return dA * dZ
+
+
 class Tanh(Activation):
     """Represents a Tanh activation function."""
     

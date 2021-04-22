@@ -229,6 +229,9 @@ class Dense(Layer):
         elif activation == RELU:
             return ReLU()
         
+        elif activation == LRELU:
+            return LeakyReLU()
+        
         elif activation == TANH:
             return Tanh()
         
