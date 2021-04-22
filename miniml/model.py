@@ -161,12 +161,18 @@ class Model(object):
         Args:
             layer: miniml.Layer
                 Layer to be added.
+        
+        Returns:
+            miniml.Layer
+                Added layer.
         """
         
         if not isinstance(layer, Layer):
             raise TypeError("Layers must be of type miniml.Layer! -> '%s'" % type(layer))
         
         self._layers.append(layer)
+        
+        return layer
     
     
     def conv2d(self, depth, ksize, stride, pad=VALID, activation=RELU, init_method=HE):
@@ -194,9 +200,13 @@ class Model(object):
             init_method: str
                 W parameter initialization method such as 'plain', 'xavier'
                 or 'he'.
+        
+        Returns:
+            miniml.Conv2D
+                Added layer.
         """
         
-        self.add(Conv2D(depth, ksize, stride, pad, activation, init_method))
+        return self.add(Conv2D(depth, ksize, stride, pad, activation, init_method))
     
     
     def dense(self, nodes, activation=RELU, init_method=HE):
@@ -214,9 +224,13 @@ class Model(object):
             init_method: str
                 W parameter initialization method such as 'plain', 'xavier'
                 or 'he'.
+        
+        Returns:
+            miniml.Dense
+                Added layer.
         """
         
-        self.add(Dense(nodes, activation, init_method))
+        return self.add(Dense(nodes, activation, init_method))
     
     
     def dropout(self, keep):
@@ -226,15 +240,25 @@ class Model(object):
         Args:
             keep: float
                 Keep probability as %/100.
+        
+        Returns:
+            miniml.Dropout
+                Added layer.
         """
         
-        self.add(Dropout(keep))
+        return self.add(Dropout(keep))
     
     
     def flatten(self):
-        """Appends new flattening layer."""
+        """
+        Appends new flattening layer.
         
-        self.add(Flatten())
+        Returns:
+            miniml.Flatten
+                Added layer.
+        """
+        
+        return self.add(Flatten())
     
     
     def maxpool(self, ksize, stride):
@@ -248,6 +272,10 @@ class Model(object):
             stride: int or (int, int) or None
                 Single step kernel shift as single value or (s_h, s_w). If set
                 to None, full kernel size is used.
+        
+        Returns:
+            miniml.MaxPool
+                Added layer.
         """
         
-        self.add(MaxPool(ksize, stride))
+        return self.add(MaxPool(ksize, stride))
