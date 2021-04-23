@@ -3,6 +3,7 @@
 import numpy as np
 from . enums import *
 from . layer import Layer
+from . activations import Activation
 from . conv import Conv2D
 from . dense import Dense
 from . dropout import Dropout
@@ -186,6 +187,23 @@ class Model(object):
         self._layers.append(layer)
         
         return layer
+    
+    
+    def activation(self, activation, **kwargs):
+        """
+        Appends new dropout layer.
+        
+        Args:
+            activation: str
+                Activation function name such as 'linear', 'sigmoid', 'relu', 'tanh' or
+                'softmax'. If set to None, activation is not applied.
+        
+        Returns:
+            miniml.Activation
+                Added layer.
+        """
+        
+        return self.add(Activation.create(activation, **kwargs))
     
     
     def conv2d(self, depth, ksize, stride, pad=VALID, activation=RELU, init_method=HE):

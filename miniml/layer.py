@@ -89,7 +89,7 @@ class Layer(object):
             Output data/activations.
         """
         
-        pass
+        return X
     
     
     def backward(self, dA, **kwargs):
@@ -105,7 +105,7 @@ class Layer(object):
             Gradients from this layer.
         """
         
-        pass
+        return dA
     
     
     def update(self, W, b):

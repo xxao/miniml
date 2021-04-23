@@ -2,7 +2,7 @@
 
 import numpy as np
 from . enums import *
-from . activations import *
+from . activations import Activation
 from . layer import Layer
 
 
@@ -29,12 +29,10 @@ class Dense(Layer):
         """
         
         self._nodes = int(nodes)
-        self._activation = self._init_activation(activation)
+        self._activation = Activation.create(activation)
         self._init_method = init_method
         
         self._X = None
-        self._A = None
-        
         self._W = None
         self._b = None
         self._dW = None
@@ -44,7 +42,11 @@ class Dense(Layer):
     def __str__(self):
         """Gets string representation."""
         
-        return "Dense(%d|%s)" % (self._nodes, self._activation)
+        activation = ""
+        if self._activation is not None:
+            activation = "|%s" % self._activation
+        
+        return "Dense(%d%s)" % (self._nodes, activation)
     
     
     @property
@@ -122,8 +124,6 @@ class Dense(Layer):
         """Clears params and caches."""
         
         self._X = None
-        self._A = None
-        
         self._W = None
         self._b = None
         self._dW = None
@@ -181,11 +181,10 @@ class Dense(Layer):
         Z = np.dot(self._X, self._W.T) + self._b
         
         # apply activation
-        self._A = Z
         if self._activation is not None:
-            self._A = self._activation.forward(Z)
+            return self._activation.forward(Z)
         
-        return self._A
+        return Z
     
     
     def backward(self, dA, lamb=0, **kwargs):
@@ -209,7 +208,7 @@ class Dense(Layer):
         # apply activation
         dZ = dA
         if self._activation is not None:
-            dZ = self._activation.backward(self._A, dA)
+            dZ = self._activation.backward(dA)
         
         # calc gradients
         self._dW = (1 / m) * np.dot(dZ.T, self._X) + (lamb / m) * self._W
@@ -234,36 +233,6 @@ class Dense(Layer):
         
         self._W = W
         self._b = b
-    
-    
-    def _init_activation(self, activation):
-        """Initializes activation function."""
-        
-        if activation is None:
-            return None
-        
-        if isinstance(activation, Activation):
-            return activation
-        
-        if activation == LINEAR:
-            return Linear()
-        
-        if activation == SIGMOID:
-            return Sigmoid()
-        
-        elif activation == RELU:
-            return ReLU()
-        
-        elif activation == LRELU:
-            return LeakyReLU()
-        
-        elif activation == TANH:
-            return Tanh()
-        
-        elif activation == SOFTMAX:
-            return Softmax()
-        
-        raise ValueError("Unknown activation function specified! -> '%s" % activation)
     
     
     def _init_params(self, n_in, n_out):

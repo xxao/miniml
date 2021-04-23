@@ -2,7 +2,7 @@
 
 import numpy as np
 from . enums import *
-from . activations import *
+from . activations import Activation
 from . layer import Layer
 from . utils import *
 
@@ -43,23 +43,25 @@ class Conv2D(Layer):
         self._ksize = (ksize, ksize) if isinstance(ksize, int) else ksize
         self._stride = (stride, stride) if isinstance(stride, int) else stride
         self._pad = self._init_padding(pad, *self._ksize)
-        self._activation = self._init_activation(activation)
+        self._activation = Activation.create(activation)
         self._init_method = init_method
         
         self._X = None
-        self._A = None
-        self._cols = None
-        
         self._W = None
         self._b = None
         self._dW = None
         self._db = None
+        self._cols = None
     
     
     def __str__(self):
         """Gets string representation."""
         
-        return "Conv2D(%dx%dx%d|%s)" % (self._ksize[0], self._ksize[0], self._depth, self._activation)
+        activation = ""
+        if self._activation is not None:
+            activation = "|%s" % self._activation
+        
+        return "Conv2D(%dx%dx%d%s)" % (self._ksize[0], self._ksize[0], self._depth, activation)
     
     
     @property
@@ -146,13 +148,11 @@ class Conv2D(Layer):
         """Clears params and caches."""
         
         self._X = None
-        self._A = None
-        self._cols = None
-        
         self._W = None
         self._b = None
         self._dW = None
         self._db = None
+        self._cols = None
     
     
     def initialize(self, shape):
@@ -218,11 +218,10 @@ class Conv2D(Layer):
         Z = Z.transpose(3, 1, 2, 0) + self._b
         
         # apply activation
-        self._A = Z
         if self._activation is not None:
-            self._A = self._activation.forward(Z)
+            return self._activation.forward(Z)
         
-        return self._A
+        return Z
     
     
     def backward(self, dA, **kwargs):
@@ -244,7 +243,7 @@ class Conv2D(Layer):
         # apply activation
         dZ = dA
         if self._activation is not None:
-            dZ = self._activation.backward(self._A, dA)
+            dZ = self._activation.backward(dA)
         
         # calc gradients
         self._db = dZ.sum(axis=(0, 1, 2)) / m
@@ -285,33 +284,6 @@ class Conv2D(Layer):
         return np.pad(x, ((0, 0), (p_t, p_b), (p_l, p_r), (0, 0)),
             mode = 'constant',
             constant_values = (0, 0))
-    
-    
-    def _init_activation(self, activation):
-        """Initializes activation function."""
-        
-        if activation is None:
-            return None
-        
-        if isinstance(activation, Activation):
-            return activation
-        
-        if activation == LINEAR:
-            return Linear()
-        
-        if activation == SIGMOID:
-            return Sigmoid()
-        
-        elif activation == RELU:
-            return ReLU()
-        
-        elif activation == LRELU:
-            return LeakyReLU()
-        
-        elif activation == TANH:
-            return Tanh()
-        
-        raise ValueError("Unsupported activation function specified! -> '%s" % activation)
     
     
     def _init_padding(self, pad, f_h, f_w):
