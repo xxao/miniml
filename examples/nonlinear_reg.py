@@ -14,10 +14,10 @@ Y = Y.reshape((len(Y), 1))
 
 # create model
 model = miniml.Model()
-model.dense(1, 'linear', 'plain')
+model.dense(1, None, 'plain')
 model.dense(64, 'relu', 'he')
 model.dense(32, 'relu', 'he')
-model.dense(1, 'linear', 'plain')
+model.dense(1, None, 'plain')
 
 # init params
 rate = 0.01
