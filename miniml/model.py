@@ -50,15 +50,21 @@ class Model(object):
                 dimension for number of samples (m).
         """
         
-        length = 81
+        length = 87
         
-        print()
-        print("=" * length)
-        print(f" {'Layer':<30} | {'Output':<25} | {'Params':>18}")
-        print("-" * length)
+        # init table
+        table = []
+        table.append("=" * length)
+        table.append(f" No. | {'Layer':<30} | {'Output':<25} | {'Params':>18}")
+        table.append("-" * length)
         
+        # add input layer
+        full_shape = (None, *shape)
+        table.append(f" {'0':>3} | {'Input':<30} | {str(full_shape):<25} | {'0':>18}")
+        
+        # add layers
         total_params = 0
-        for layer in self._layers:
+        for i, layer in enumerate(self._layers):
             
             params = layer.params(shape)
             total_params += params
@@ -66,11 +72,18 @@ class Model(object):
             shape = layer.outshape(shape)
             full_shape = (None, *shape)
             
-            print(f" {str(layer):<30} | {str(full_shape):<25} | {params:>18,}")
+            table.append(f" {i+1:>3} | {str(layer):<30} | {str(full_shape):<25} | {params:>18,}")
         
-        print("-" * length)
-        print(f"{'Total':>59} | {total_params:>18,}")
-        print("=" * length)
+        # add total
+        table.append("-" * length)
+        table.append(f"{'Total':>65} | {total_params:>18,}")
+        table.append("=" * length)
+        
+        # build string
+        summary = "\n".join(table)
+        
+        # show table
+        print(summary)
     
     
     def clear(self):
