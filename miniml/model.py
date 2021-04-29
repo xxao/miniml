@@ -126,20 +126,20 @@ class Model(object):
                 Predicted output with shape (m,?).
         """
         
-        for layer in self._layers:
-            if not isinstance(layer, Dropout):
-                A = layer.forward(A)
-        
-        return A
+        return self.forward(A, False)
     
     
-    def forward(self, A):
+    def forward(self, A, training=True):
         """
         Performs forward propagation through all layers.
         
         Args:
             A: np.ndarray
                 Input data of shape (m,...).
+            
+            training: bool
+                If set to True, the input data/activations are considered as
+                training set.
         
         Returns:
             Y_hat:
@@ -147,7 +147,7 @@ class Model(object):
         """
         
         for layer in self._layers:
-            A = layer.forward(A)
+            A = layer.forward(A, training)
         
         return A
     

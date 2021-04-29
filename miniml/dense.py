@@ -155,7 +155,7 @@ class Dense(Layer):
         return self.outshape(shape)
     
     
-    def forward(self, X, keep=1, **kwargs):
+    def forward(self, X, training=None, **kwargs):
         """
         Performs forward propagation using activations from previous layer.
         
@@ -164,8 +164,9 @@ class Dense(Layer):
                 Input data or activations from previous (left) layer.
                 The expected shape is (m, n).
             
-            keep: float
-                Dropout keep probability (0-1).
+            training: bool
+                If set to True, the input data/activations are considered as
+                training set.
         
         Returns:
             Calculated activations from this layer.

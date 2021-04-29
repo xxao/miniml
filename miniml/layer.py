@@ -7,6 +7,12 @@ class Layer(object):
     OPTIMIZE = False
     
     
+    def __str__(self):
+        """Gets string representation."""
+        
+        return self.__class__.__name__
+    
+    
     def __repr__(self):
         """Gets debug representation."""
         
@@ -76,7 +82,7 @@ class Layer(object):
         return self.outshape(shape)
     
     
-    def forward(self, X, **kwargs):
+    def forward(self, X, training, **kwargs):
         """
         Performs forward propagation using activations from previous layer.
         
@@ -84,6 +90,10 @@ class Layer(object):
             X: np.ndarray
                 Input data/activations from previous (left) layer.
                 The expected shape is (m, ...).
+            
+            training: bool
+                If set to True, the input data/activations are considered as
+                training set.
         
         Returns:
             Output data/activations.

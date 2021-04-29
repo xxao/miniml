@@ -33,7 +33,7 @@ class Dropout(Layer):
         self._mask = None
     
     
-    def forward(self, X, **kwargs):
+    def forward(self, X, training, **kwargs):
         """
         Performs forward propagation using activations from previous layer.
         
@@ -41,12 +41,16 @@ class Dropout(Layer):
             X: np.ndarray
                 Input data/activations from previous (left) layer.
                 The expected shape is (m, ...).
+            
+            training: bool
+                If set to True, the input data/activations are considered as
+                training set.
         
         Returns:
             Output data/activations.
         """
         
-        if self._keep == 1:
+        if not training or self._keep == 1:
             return X
         
         self._mask = np.random.rand(X.shape[1], X.shape[0]).T

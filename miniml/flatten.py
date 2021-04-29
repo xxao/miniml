@@ -14,12 +14,6 @@ class Flatten(Layer):
         self._shape = None
     
     
-    def __str__(self):
-        """Gets string representation."""
-        
-        return "Flatten"
-    
-    
     def outshape(self, shape):
         """
         Calculates output shape.
@@ -44,7 +38,7 @@ class Flatten(Layer):
         self._shape = None
     
     
-    def forward(self, X, **kwargs):
+    def forward(self, X, training=None, **kwargs):
         """
         Performs forward propagation using activations from previous layer.
         
@@ -52,6 +46,10 @@ class Flatten(Layer):
             X: np.ndarray
                 Input data/activations from previous (left) layer.
                 The expected shape is (m, n_h, n_w, n_c).
+            
+            training: bool
+                If set to True, the input data/activations are considered as
+                training set.
         
         Returns:
             Flattened data into (m, n_h x n_w x n_c).

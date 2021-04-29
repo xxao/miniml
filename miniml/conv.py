@@ -185,7 +185,7 @@ class Conv2D(Layer):
         return h_out, w_out, c_out
     
     
-    def forward(self, X, **kwargs):
+    def forward(self, X, training=None, **kwargs):
         """
         Performs forward propagation using activations from previous layer.
         
@@ -193,6 +193,10 @@ class Conv2D(Layer):
             X: np.ndarray
                 Input data/activations from previous (left) layer.
                 The expected shape is (m, n_h, n_w, n_c).
+            
+            training: bool
+                If set to True, the input data/activations are considered as
+                training set.
         
         Returns:
             Calculated activations from this layer.
