@@ -67,7 +67,7 @@ class Model(object):
         total_params = 0
         for i, layer in enumerate(self._layers):
             
-            params = layer.params(shape)
+            params = layer.paramcount(shape)
             total_params += params
             
             shape = layer.outshape(shape)

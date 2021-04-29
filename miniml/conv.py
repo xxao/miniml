@@ -10,8 +10,6 @@ from . utils import *
 class Conv2D(Layer):
     """Represents a 2D convolution layer of neural network."""
     
-    OPTIMIZE = True
-    
     
     def __init__(self, depth, ksize, stride=1, pad=VALID, activation=RELU, init_method=PLAIN):
         """
@@ -65,31 +63,17 @@ class Conv2D(Layer):
     
     
     @property
-    def W(self):
-        """Gets current weights."""
+    def parameters(self):
+        """Gets all layer parameters."""
         
-        return self._W
+        return self._W, self._b
     
     
     @property
-    def b(self):
-        """Gets current biases."""
+    def gradients(self):
+        """Gets all layer gradients."""
         
-        return self._b
-    
-    
-    @property
-    def dW(self):
-        """Gets current weights gradients."""
-        
-        return self._dW
-    
-    
-    @property
-    def db(self):
-        """Gets current biases gradients."""
-        
-        return self._db
+        return self._dW, self._db
     
     
     def outshape(self, shape):
@@ -118,7 +102,7 @@ class Conv2D(Layer):
         return h_out, w_out, c_out
     
     
-    def params(self, shape):
+    def paramcount(self, shape):
         """
         Calculates number of trainable params.
         
@@ -228,7 +212,7 @@ class Conv2D(Layer):
         return Z
     
     
-    def backward(self, dA, **kwargs):
+    def backward(self, dA, lamb=0, **kwargs):
         """
         Performs backward propagation using upstream gradients.
         
@@ -236,6 +220,9 @@ class Conv2D(Layer):
             dA:
                 Gradients from previous (right) layer.
                 The expected shape is (m, n_h, n_w, n_c).
+            
+            lamb: float
+                Lambda parameter for L2 regularization.
         
         Returns:
             Gradients from this layer.
@@ -250,11 +237,12 @@ class Conv2D(Layer):
             dZ = self._activation.backward(dA)
         
         # calc gradients
-        self._db = dZ.sum(axis=(0, 1, 2)) / m
         dZ = dZ.transpose(3, 1, 2, 0).reshape(c_out, -1)
         W = np.transpose(self._W, (3, 2, 0, 1))
         dW = dZ.dot(self._cols.T).reshape(W.shape)
-        self._dW = np.transpose(dW, (2, 3, 1, 0)) / m
+        
+        self._dW = (1 / m) * np.transpose(dW, (2, 3, 1, 0)) + (lamb / m) * self._W
+        self._db = (1 / m) * dZ.sum(axis=(0, 1, 2))
         
         # apply reversed convolution
         cols = W.reshape(c_out, -1).T.dot(dZ)
@@ -264,20 +252,29 @@ class Conv2D(Layer):
         return dX
     
     
-    def update(self, W, b):
+    def update(self, *params):
         """
         Updates layer params.
         
         Args:
-            W: np.ndarray
-                Weights.
-            
-            b: np.ndarray
-                Biases.
+            *params: (np.ndarray,)
+                Params to update as W and b.
         """
         
-        self._W = W
-        self._b = b
+        self._W = params[0]
+        self._b = params[1]
+    
+    
+    def loss(self):
+        """
+        Calculates regularization loss.
+        
+        Returns:
+            float
+                Regularization loss.
+        """
+        
+        return np.sum(np.square(self._W))
     
     
     def _zero_pad(self, x):

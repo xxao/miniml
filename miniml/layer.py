@@ -4,8 +4,6 @@
 class Layer(object):
     """Represents a base class for various types of neural network layers."""
     
-    OPTIMIZE = False
-    
     
     def __str__(self):
         """Gets string representation."""
@@ -17,6 +15,27 @@ class Layer(object):
         """Gets debug representation."""
         
         return self.__str__()
+    
+    
+    @property
+    def trainable(self):
+        """Returns True if layer has parameters to train."""
+        
+        return self.parameters is not None
+    
+    
+    @property
+    def parameters(self):
+        """Gets all layer parameters."""
+        
+        return None
+    
+    
+    @property
+    def gradients(self):
+        """Gets all layer gradients."""
+        
+        return None
     
     
     def outshape(self, shape):
@@ -37,7 +56,7 @@ class Layer(object):
         return shape
     
     
-    def params(self, shape):
+    def paramcount(self, shape):
         """
         Calculates number of trainable params.
         
@@ -131,3 +150,15 @@ class Layer(object):
         """
         
         pass
+    
+    
+    def loss(self):
+        """
+        Calculates regularization loss.
+        
+        Returns:
+            float
+                Regularization loss.
+        """
+        
+        return 0

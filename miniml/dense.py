@@ -9,8 +9,6 @@ from . layer import Layer
 class Dense(Layer):
     """Represents a fully connected linear layer of neural network."""
     
-    OPTIMIZE = True
-    
     
     def __init__(self, nodes, activation=RELU, init_method=HE):
         """
@@ -50,31 +48,17 @@ class Dense(Layer):
     
     
     @property
-    def W(self):
-        """Gets current weights."""
+    def parameters(self):
+        """Gets all layer parameters."""
         
-        return self._W
+        return self._W, self._b
     
     
     @property
-    def b(self):
-        """Gets current biases."""
+    def gradients(self):
+        """Gets all layer gradients."""
         
-        return self._b
-    
-    
-    @property
-    def dW(self):
-        """Gets current weights gradients."""
-        
-        return self._dW
-    
-    
-    @property
-    def db(self):
-        """Gets current biases gradients."""
-        
-        return self._db
+        return self._dW, self._db
     
     
     def outshape(self, shape):
@@ -95,7 +79,7 @@ class Dense(Layer):
         return (self._nodes, )
     
     
-    def params(self, shape):
+    def paramcount(self, shape):
         """
         Calculates number of trainable params.
         
@@ -220,20 +204,29 @@ class Dense(Layer):
         return dX
     
     
-    def update(self, W, b):
+    def update(self, *params):
         """
         Updates layer params.
         
         Args:
-            W: np.ndarray
-                Weights.
-            
-            b: np.ndarray
-                Biases.
+            *params: (np.ndarray,)
+                Params to update as W and b.
         """
         
-        self._W = W
-        self._b = b
+        self._W = params[0]
+        self._b = params[1]
+    
+    
+    def loss(self):
+        """
+        Calculates regularization loss.
+        
+        Returns:
+            float
+                Regularization loss.
+        """
+        
+        return np.sum(np.square(self._W))
     
     
     def _init_params(self, n_in, n_out):

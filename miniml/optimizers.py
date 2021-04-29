@@ -167,8 +167,8 @@ class Optimizer(object):
         # apply L2 regularization
         if lamb != 0:
             m = Y.shape[0]
-            Ws = sum(np.sum(np.square(layer.W)) for layer in model.layers)
-            L2_cost = (lamb / (2 * m)) * Ws
+            losses = sum(layer.loss() for layer in model.layers)
+            L2_cost = (lamb / (2 * m)) * losses
             cost += L2_cost
         
         return cost, dA
@@ -241,16 +241,22 @@ class GradDescent(Optimizer):
         # update model
         for i, layer in enumerate(model.layers):
             
-            # skip if not to optimize
-            if not layer.OPTIMIZE:
+            # check if trainable
+            if not layer.trainable:
                 continue
             
+            # get params and gradients
+            params = layer.parameters
+            grads = layer.gradients
+            
             # update params
-            W = layer.W - rate * layer.dW
-            b = layer.b - rate * layer.db
+            updates = []
+            for p in range(len(params)):
+                param = params[p] - rate * grads[p]
+                updates.append(param)
             
             # update layer
-            layer.update(W, b)
+            layer.update(*updates)
 
 
 class Momentum(Optimizer):
@@ -312,32 +318,41 @@ class Momentum(Optimizer):
         # update model
         for i, layer in enumerate(model.layers):
             
-            # skip if not to optimize
-            if not layer.OPTIMIZE:
+            # check if trainable
+            if not layer.trainable:
                 continue
+            
+            # get params and gradients
+            params = layer.parameters
+            grads = layer.gradients
             
             # init cache
             if self.cache[i] is None:
-                self.cache[i] = {}
-                vdW = np.zeros(layer.dW.shape)
-                vdb = np.zeros(layer.db.shape)
-            else:
-                vdW = self.cache[i]['vdW']
-                vdb = self.cache[i]['vdb']
+                self.cache[i] = {'v': [None]*len(params)}
             
             # update params
-            vdW = beta * vdW + (1 - beta) * layer.dW
-            vdb = beta * vdb + (1 - beta) * layer.db
-            
-            W = layer.W - rate * vdW
-            b = layer.b - rate * vdb
+            updates = []
+            for p in range(len(params)):
+                
+                # get layer parameter and its gradient
+                param = params[p]
+                grad = grads[p]
+                
+                # get or init gradient v
+                v_grad = self.cache[i]['v'][p]
+                if v_grad is None:
+                    v_grad = np.zeros(grad.shape)
+                
+                # update param
+                v_grad = beta * v_grad + (1 - beta) * grad
+                param = param - rate * v_grad
+                updates.append(param)
+                
+                # update cache
+                self.cache[i]['v'][p] = v_grad
             
             # update layer
-            layer.update(W, b)
-            
-            # update cache
-            self.cache[i]['vdW'] = vdW
-            self.cache[i]['vdb'] = vdb
+            layer.update(*updates)
 
 
 class RMSprop(Optimizer):
@@ -402,32 +417,41 @@ class RMSprop(Optimizer):
         # update model
         for i, layer in enumerate(model.layers):
             
-            # skip if not to optimize
-            if not layer.OPTIMIZE:
+            # check if trainable
+            if not layer.trainable:
                 continue
+            
+            # get params and gradients
+            params = layer.parameters
+            grads = layer.gradients
             
             # init cache
             if self.cache[i] is None:
-                self.cache[i] = {}
-                sdW = np.zeros(layer.dW.shape)
-                sdb = np.zeros(layer.db.shape)
-            else:
-                sdW = self.cache[i]['sdW']
-                sdb = self.cache[i]['sdb']
+                self.cache[i] = {'s': [None]*len(params)}
             
             # update params
-            sdW = beta * sdW + (1 - beta) * layer.dW**2
-            sdb = beta * sdb + (1 - beta) * layer.db**2
-            
-            W = layer.W - rate * layer.dW / np.sqrt(sdW + epsilon)
-            b = layer.b - rate * layer.db / np.sqrt(sdb + epsilon)
+            updates = []
+            for p in range(len(params)):
+                
+                # get layer parameter and its gradient
+                param = params[p]
+                grad = grads[p]
+                
+                # get or init gradient s
+                s_grad = self.cache[i]['s'][p]
+                if s_grad is None:
+                    s_grad = np.zeros(grad.shape)
+                
+                # update param
+                s_grad = beta * s_grad + (1 - beta) * grad**2
+                param = param - rate * grad / np.sqrt(s_grad + epsilon)
+                updates.append(param)
+                
+                # update cache
+                self.cache[i]['s'][p] = s_grad
             
             # update layer
-            layer.update(W, b)
-            
-            # update cache
-            self.cache[i]['sdW'] = sdW
-            self.cache[i]['sdb'] = sdb
+            layer.update(*updates)
 
 
 class Adam(Optimizer):
@@ -502,50 +526,59 @@ class Adam(Optimizer):
         # update model
         for i, layer in enumerate(model.layers):
             
-            # skip if not to optimize
-            if not layer.OPTIMIZE:
+            # check if trainable
+            if not layer.trainable:
                 continue
+            
+            # get params and gradients
+            params = layer.parameters
+            grads = layer.gradients
             
             # init cache
             if self.cache[i] is None:
-                self.cache[i] = {}
-                t = 1
-                vdW = np.zeros(layer.dW.shape)
-                vdb = np.zeros(layer.db.shape)
-                sdW = np.zeros(layer.dW.shape)
-                sdb = np.zeros(layer.db.shape)
-            else:
-                t = self.cache[i]['t'] + 1
-                sdW = self.cache[i]['sdW']
-                sdb = self.cache[i]['sdb']
-                vdW = self.cache[i]['vdW']
-                vdb = self.cache[i]['vdb']
+                self.cache[i] = {
+                    't': 0,
+                    'v': [None]*len(params),
+                    's': [None]*len(params)}
+            
+            # update and get cycle
+            self.cache[i]['t'] += 1
+            t = self.cache[i]['t']
             
             # update params
-            vdW = beta1 * vdW + (1 - beta1) * layer.dW
-            vdb = beta1 * vdb + (1 - beta1) * layer.db
-            
-            v_corr_dW = vdW / (1 - beta1**t)
-            v_corr_db = vdb / (1 - beta1**t)
-            
-            sdW = beta2 * sdW + (1 - beta2) * layer.dW**2
-            sdb = beta2 * sdb + (1 - beta2) * layer.db**2
-            
-            s_corr_dW = sdW / (1 - beta2**t)
-            s_corr_db = sdb / (1 - beta2**t)
-            
-            W = layer.W - rate * v_corr_dW / (s_corr_dW**0.5 + epsilon)
-            b = layer.b - rate * v_corr_db / (s_corr_db**0.5 + epsilon)
+            updates = []
+            for p in range(len(params)):
+                
+                # get layer parameter and its gradient
+                param = params[p]
+                grad = grads[p]
+                
+                # get or init gradient v
+                v_grad = self.cache[i]['v'][p]
+                if v_grad is None:
+                    v_grad = np.zeros(grad.shape)
+                
+                # get or init gradient s
+                s_grad = self.cache[i]['s'][p]
+                if s_grad is None:
+                    s_grad = np.zeros(grad.shape)
+                
+                # update param
+                v_grad = beta1 * v_grad + (1 - beta1) * grad
+                v_corr = v_grad / (1 - beta1**t)
+                
+                s_grad = beta2 * s_grad + (1 - beta2) * grad**2
+                s_corr = s_grad / (1 - beta2**t)
+                
+                param = param - rate * v_corr / (s_corr**0.5 + epsilon)
+                updates.append(param)
+                
+                # update cache
+                self.cache[i]['v'][p] = v_grad
+                self.cache[i]['s'][p] = s_grad
             
             # update layer
-            layer.update(W, b)
-            
-            # update cache
-            self.cache[i]['t'] = t
-            self.cache[i]['vdW'] = vdW
-            self.cache[i]['vdb'] = vdb
-            self.cache[i]['sdW'] = sdW
-            self.cache[i]['sdb'] = sdb
+            layer.update(*updates)
 
 
 class Adagrad(Optimizer):
@@ -603,29 +636,38 @@ class Adagrad(Optimizer):
         # update model
         for i, layer in enumerate(model.layers):
             
-            # skip if not to optimize
-            if not layer.OPTIMIZE:
+            # check if trainable
+            if not layer.trainable:
                 continue
+            
+            # get params and gradients
+            params = layer.parameters
+            grads = layer.gradients
             
             # init cache
             if self.cache[i] is None:
-                self.cache[i] = {}
-                sdW = np.zeros(layer.dW.shape)
-                sdb = np.zeros(layer.db.shape)
-            else:
-                sdW = self.cache[i]['sdW']
-                sdb = self.cache[i]['sdb']
+                self.cache[i] = {'s': [None]*len(params)}
             
             # update params
-            sdW = sdW + layer.dW**2
-            sdb = sdb + layer.db**2
-            
-            W = layer.W - rate * layer.dW / np.sqrt(sdW + epsilon)
-            b = layer.b - rate * layer.db / np.sqrt(sdb + epsilon)
+            updates = []
+            for p in range(len(params)):
+                
+                # get layer parameter and its gradient
+                param = params[p]
+                grad = grads[p]
+                
+                # get or init gradient s
+                s_grad = self.cache[i]['s'][p]
+                if s_grad is None:
+                    s_grad = np.zeros(grad.shape)
+                
+                # update param
+                s_grad = s_grad + grad**2
+                param = param - rate * grad / np.sqrt(s_grad + epsilon)
+                updates.append(param)
+                
+                # update cache
+                self.cache[i]['s'][p] = s_grad
             
             # update layer
-            layer.update(W, b)
-            
-            # update cache
-            self.cache[i]['sdW'] = sdW
-            self.cache[i]['sdb'] = sdb
+            layer.update(*updates)
