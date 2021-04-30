@@ -21,21 +21,21 @@ class Layer(object):
     def trainable(self):
         """Returns True if layer has parameters to train."""
         
-        return self.parameters is not None
+        return len(self.parameters) > 0
     
     
     @property
     def parameters(self):
         """Gets all layer parameters."""
         
-        return None
+        return []
     
     
     @property
     def gradients(self):
         """Gets all layer gradients."""
         
-        return None
+        return []
     
     
     def outshape(self, shape):
