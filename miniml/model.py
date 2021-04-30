@@ -87,13 +87,6 @@ class Model(object):
         print(summary)
     
     
-    def clear(self):
-        """Resets params and caches in all layers."""
-        
-        for layer in self._layers:
-            layer.clear()
-    
-    
     def initialize(self, shape):
         """
         Clears caches and re-initializes params in all layers.

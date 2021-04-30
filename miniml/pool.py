@@ -42,9 +42,9 @@ class MaxPool(Layer):
         return "MaxPool(%dx%d)" % (self._ksize[0], self._ksize[1])
     
     
-    def outshape(self, shape):
+    def initialize(self, shape):
         """
-        Calculates output shape.
+        Clears caches and re-initializes params.
         
         Args:
             shape: (int,)
@@ -57,23 +57,13 @@ class MaxPool(Layer):
                 number of samples (m).
         """
         
-        h_in, w_in, c_in = shape
-        f_h, f_w = self._ksize
-        p_t, p_b, p_l, p_r = self._pad
-        s_h, s_w = self._stride
-        h_out = int(1 + (h_in - f_h + p_t + p_b) / s_h)
-        w_out = int(1 + (w_in - f_w + p_l + p_r) / s_w)
-        c_out = c_in
-        
-        return h_out, w_out, c_out
-    
-    
-    def clear(self):
-        """Clears params and caches."""
-        
+        # clear params and caches
         self._X_shape = None
         self._cols = None
         self._max_idx = None
+        
+        # return output shape
+        return self.outshape(shape)
     
     
     def forward(self, X, training=None, **kwargs):
@@ -135,3 +125,29 @@ class MaxPool(Layer):
         dX = dX.transpose(0, 2, 3, 1)
         
         return dX
+    
+    
+    def outshape(self, shape):
+        """
+        Calculates output shape.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        
+        h_in, w_in, c_in = shape
+        f_h, f_w = self._ksize
+        p_t, p_b, p_l, p_r = self._pad
+        s_h, s_w = self._stride
+        h_out = int(1 + (h_in - f_h + p_t + p_b) / s_h)
+        w_out = int(1 + (w_in - f_w + p_l + p_r) / s_w)
+        c_out = c_in
+        
+        return h_out, w_out, c_out

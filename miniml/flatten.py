@@ -14,9 +14,9 @@ class Flatten(Layer):
         self._shape = None
     
     
-    def outshape(self, shape):
+    def initialize(self, shape):
         """
-        Calculates output shape.
+        Clears caches and re-initializes params.
         
         Args:
             shape: (int,)
@@ -29,13 +29,11 @@ class Flatten(Layer):
                 number of samples (m).
         """
         
-        return (np.prod(shape), )
-    
-    
-    def clear(self):
-        """Clears params and caches."""
-        
+        # clear params and caches
         self._shape = None
+        
+        # return output shape
+        return self.outshape(shape)
     
     
     def forward(self, X, training=None, **kwargs):
@@ -73,3 +71,21 @@ class Flatten(Layer):
         """
         
         return dA.reshape(self._shape)
+    
+    
+    def outshape(self, shape):
+        """
+        Calculates output shape.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        
+        return (np.prod(shape), )

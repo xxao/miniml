@@ -47,73 +47,6 @@ class Dense(Layer):
         return "Dense(%d%s)" % (self._nodes, activation)
     
     
-    @property
-    def parameters(self):
-        """Gets all layer parameters."""
-        
-        return self._W, self._b
-    
-    
-    @property
-    def gradients(self):
-        """Gets all layer gradients."""
-        
-        return self._dW, self._db
-    
-    
-    def outshape(self, shape):
-        """
-        Calculates output shape.
-        
-        Args:
-            shape: (int,)
-                Expected input shape. The shape must be provided without first
-                dimension for number of samples (m).
-        
-        Returns:
-            (int,)
-                Output shape. The shape is provided without first dimension for
-                number of samples (m).
-        """
-        
-        return (self._nodes, )
-    
-    
-    def paramcount(self, shape):
-        """
-        Calculates number of trainable params.
-        
-        Args:
-            shape: (int,)
-                Expected input shape. The shape must be provided without first
-                dimension for number of samples (m).
-        
-        Returns:
-            int
-                Number of trainable params.
-        """
-        
-        # get dimensions
-        n_in = shape[0]
-        n_out = self._nodes
-        
-        # count params
-        w = n_in * n_out
-        b = n_out
-        
-        return w + b
-    
-    
-    def clear(self):
-        """Clears params and caches."""
-        
-        self._X = None
-        self._W = None
-        self._b = None
-        self._dW = None
-        self._db = None
-    
-    
     def initialize(self, shape):
         """
         Clears caches and re-initializes params.
@@ -130,7 +63,11 @@ class Dense(Layer):
         """
         
         # clear params and caches
-        self.clear()
+        self._X = None
+        self._W = None
+        self._b = None
+        self._dW = None
+        self._db = None
         
         # init params
         self._init_params(shape[0], self._nodes)
@@ -215,6 +152,61 @@ class Dense(Layer):
         
         self._W = params[0]
         self._b = params[1]
+    
+    
+    def outshape(self, shape):
+        """
+        Calculates output shape.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        
+        return (self._nodes, )
+    
+    
+    def paramcount(self, shape):
+        """
+        Calculates number of trainable params.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            int
+                Number of trainable params.
+        """
+        
+        # get dimensions
+        n_in = shape[0]
+        n_out = self._nodes
+        
+        # count params
+        w = n_in * n_out
+        b = n_out
+        
+        return w + b
+    
+    
+    def parameters(self):
+        """Gets all layer parameters."""
+        
+        return self._W, self._b
+    
+    
+    def gradients(self):
+        """Gets all layer gradients."""
+        
+        return self._dW, self._db
     
     
     def loss(self):

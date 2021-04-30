@@ -62,83 +62,6 @@ class Conv2D(Layer):
         return "Conv2D(%dx%dx%d%s)" % (self._ksize[0], self._ksize[0], self._depth, activation)
     
     
-    @property
-    def parameters(self):
-        """Gets all layer parameters."""
-        
-        return self._W, self._b
-    
-    
-    @property
-    def gradients(self):
-        """Gets all layer gradients."""
-        
-        return self._dW, self._db
-    
-    
-    def outshape(self, shape):
-        """
-        Calculates output shape.
-        
-        Args:
-            shape: (int,)
-                Expected input shape. The shape must be provided without first
-                dimension for number of samples (m).
-        
-        Returns:
-            (int,)
-                Output shape. The shape is provided without first dimension for
-                number of samples (m).
-        """
-        
-        h_in, w_in, c_in = shape
-        f_h, f_w = self._ksize
-        p_t, p_b, p_l, p_r = self._pad
-        s_h, s_w = self._stride
-        h_out = int(1 + (h_in - f_h + p_t + p_b) / s_h)
-        w_out = int(1 + (w_in - f_w + p_l + p_r) / s_w)
-        c_out = self._depth
-        
-        return h_out, w_out, c_out
-    
-    
-    def paramcount(self, shape):
-        """
-        Calculates number of trainable params.
-        
-        Args:
-            shape: (int,)
-                Expected input shape. The shape must be provided without first
-                dimension for number of samples (m).
-        
-        Returns:
-            int
-                Number of trainable params.
-        """
-        
-        # get dimensions
-        h_in, w_in, c_in = shape
-        f_h, f_w = self._ksize
-        h_out, w_out, c_out = self.outshape(shape)
-        
-        # count params
-        w = f_h * f_w * c_in * c_out
-        b = c_out
-        
-        return w + b
-    
-    
-    def clear(self):
-        """Clears params and caches."""
-        
-        self._X = None
-        self._W = None
-        self._b = None
-        self._dW = None
-        self._db = None
-        self._cols = None
-    
-    
     def initialize(self, shape):
         """
         Clears caches and re-initializes params.
@@ -155,7 +78,12 @@ class Conv2D(Layer):
         """
         
         # clear params and caches
-        self.clear()
+        self._X = None
+        self._W = None
+        self._b = None
+        self._dW = None
+        self._db = None
+        self._cols = None
         
         # get dimensions
         h_in, w_in, c_in = shape
@@ -263,6 +191,70 @@ class Conv2D(Layer):
         
         self._W = params[0]
         self._b = params[1]
+    
+    
+    def outshape(self, shape):
+        """
+        Calculates output shape.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        
+        h_in, w_in, c_in = shape
+        f_h, f_w = self._ksize
+        p_t, p_b, p_l, p_r = self._pad
+        s_h, s_w = self._stride
+        h_out = int(1 + (h_in - f_h + p_t + p_b) / s_h)
+        w_out = int(1 + (w_in - f_w + p_l + p_r) / s_w)
+        c_out = self._depth
+        
+        return h_out, w_out, c_out
+    
+    
+    def paramcount(self, shape):
+        """
+        Calculates number of trainable params.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            int
+                Number of trainable params.
+        """
+        
+        # get dimensions
+        h_in, w_in, c_in = shape
+        f_h, f_w = self._ksize
+        h_out, w_out, c_out = self.outshape(shape)
+        
+        # count params
+        w = f_h * f_w * c_in * c_out
+        b = c_out
+        
+        return w + b
+    
+    
+    def parameters(self):
+        """Gets all layer parameters."""
+        
+        return self._W, self._b
+    
+    
+    def gradients(self):
+        """Gets all layer gradients."""
+        
+        return self._dW, self._db
     
     
     def loss(self):

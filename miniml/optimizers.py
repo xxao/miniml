@@ -246,8 +246,8 @@ class GradDescent(Optimizer):
                 continue
             
             # get params and gradients
-            params = layer.parameters
-            grads = layer.gradients
+            params = layer.parameters()
+            grads = layer.gradients()
             
             # update params
             updates = []
@@ -323,8 +323,8 @@ class Momentum(Optimizer):
                 continue
             
             # get params and gradients
-            params = layer.parameters
-            grads = layer.gradients
+            params = layer.parameters()
+            grads = layer.gradients()
             
             # init cache
             if self.cache[i] is None:
@@ -422,8 +422,8 @@ class RMSprop(Optimizer):
                 continue
             
             # get params and gradients
-            params = layer.parameters
-            grads = layer.gradients
+            params = layer.parameters()
+            grads = layer.gradients()
             
             # init cache
             if self.cache[i] is None:
@@ -531,8 +531,8 @@ class Adam(Optimizer):
                 continue
             
             # get params and gradients
-            params = layer.parameters
-            grads = layer.gradients
+            params = layer.parameters()
+            grads = layer.gradients()
             
             # init cache
             if self.cache[i] is None:
@@ -641,8 +641,8 @@ class Adagrad(Optimizer):
                 continue
             
             # get params and gradients
-            params = layer.parameters
-            grads = layer.gradients
+            params = layer.parameters()
+            grads = layer.gradients()
             
             # init cache
             if self.cache[i] is None:

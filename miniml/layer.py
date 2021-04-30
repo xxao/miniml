@@ -21,62 +21,7 @@ class Layer(object):
     def trainable(self):
         """Returns True if layer has parameters to train."""
         
-        return len(self.parameters) > 0
-    
-    
-    @property
-    def parameters(self):
-        """Gets all layer parameters."""
-        
-        return []
-    
-    
-    @property
-    def gradients(self):
-        """Gets all layer gradients."""
-        
-        return []
-    
-    
-    def outshape(self, shape):
-        """
-        Calculates output shape.
-        
-        Args:
-            shape: (int,)
-                Expected input shape. The shape must be provided without first
-                dimension for number of samples (m).
-        
-        Returns:
-            (int,)
-                Output shape. The shape is provided without first dimension for
-                number of samples (m).
-        """
-        
-        return shape
-    
-    
-    def paramcount(self, shape):
-        """
-        Calculates number of trainable params.
-        
-        Args:
-            shape: (int,)
-                Expected input shape. The shape must be provided without first
-                dimension for number of samples (m).
-        
-        Returns:
-            int
-                Number of trainable params.
-        """
-        
-        return 0
-    
-    
-    def clear(self):
-        """Clears params and caches."""
-        
-        pass
+        return len(self.parameters()) > 0
     
     
     def initialize(self, shape):
@@ -94,10 +39,6 @@ class Layer(object):
                 number of samples (m).
         """
         
-        # clear params and caches
-        self.clear()
-        
-        # return output shape
         return self.outshape(shape)
     
     
@@ -137,19 +78,63 @@ class Layer(object):
         return dA
     
     
-    def update(self, W, b):
+    def update(self, *params):
         """
         Updates layer params.
         
         Args:
-            W: np.ndarray
-                Weights.
-            
-            b: np.ndarray
-                Biases.
+            *params: (np.ndarray,)
+                Params to update.
         """
         
         pass
+    
+    
+    def outshape(self, shape):
+        """
+        Calculates output shape.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        
+        return shape
+    
+    
+    def paramcount(self, shape):
+        """
+        Calculates number of trainable params.
+        
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            int
+                Number of trainable params.
+        """
+        
+        return 0
+    
+    
+    def parameters(self):
+        """Gets all layer parameters."""
+        
+        return []
+    
+    
+    def gradients(self):
+        """Gets all layer gradients."""
+        
+        return []
     
     
     def loss(self):

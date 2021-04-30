@@ -12,6 +12,7 @@ C = 3  # classes
 X = np.zeros((N*C, 2))
 y = np.zeros(N*C, dtype='uint8')
 
+np.random.seed(3)
 for j in range(C):
     r = np.linspace(0.0, 1, N)
     t = np.linspace(j*4, (j+1)*4, N) + np.random.randn(N) * 0.2

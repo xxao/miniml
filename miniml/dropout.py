@@ -27,10 +27,26 @@ class Dropout(Layer):
         return "Dropout(%.2f)" % self._keep
     
     
-    def clear(self):
-        """Clears params and caches."""
+    def initialize(self, shape):
+        """
+        Clears caches and re-initializes params.
         
+        Args:
+            shape: (int,)
+                Expected input shape. The shape must be provided without first
+                dimension for number of samples (m).
+        
+        Returns:
+            (int,)
+                Output shape. The shape is provided without first dimension for
+                number of samples (m).
+        """
+        
+        # clear params and caches
         self._mask = None
+        
+        # return output shape
+        return self.outshape(shape)
     
     
     def forward(self, X, training, **kwargs):
