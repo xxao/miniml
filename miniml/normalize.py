@@ -20,6 +20,9 @@ class BatchNorm(Layer):
         self._dbeta = None
         self._mean = None
         self._variance = None
+        self._var_sqrt = None
+        self._X_mean = None
+        self._X_hat = None
     
     
     def initialize(self, shape):
@@ -44,6 +47,9 @@ class BatchNorm(Layer):
         self._dbeta = None
         self._mean = None
         self._variance = None
+        self._var_sqrt = None
+        self._X_mean = None
+        self._X_hat = None
         
         # init params
         self._init_params(shape)
@@ -70,21 +76,19 @@ class BatchNorm(Layer):
             input shape.
         """
         
-        self._X = X
-        
         # init params
         if self._gamma is None:
             self._init_params(X.shape[1:])
         
         # get mean and variance
+        mean = self._mean
+        variance = self._variance
+        
+        # use current batch
         if training:
             axis = tuple(range(X.ndim-1))
             mean = np.mean(X, axis=axis)
             variance = np.mean((X - mean)**2, axis=axis)
-         
-        else:
-            mean = self._mean
-            variance = self._variance
         
         # normalize
         var_sqrt = np.sqrt(variance + self._epsilon)
@@ -94,15 +98,13 @@ class BatchNorm(Layer):
         # scale and shift
         A = self._gamma * X_hat + self._beta
         
-        # update running mean and variance
+        # update running mean and variance and fill cache
         if training:
             self._mean = self._mean * self._momentum + (1 - self._momentum) * mean
             self._variance = self._variance * self._momentum + (1 - self._momentum) * variance
-            
-            var_sqrt = np.sqrt(self._variance + self._epsilon)
-            #X_mean = (X - self._mean)
-            X_hat = X_mean / var_sqrt
-            self._cache = [X_mean, X_hat, var_sqrt]
+            self._var_sqrt = var_sqrt
+            self._X_mean = X_mean
+            self._X_hat = X_hat
         
         return A
     
@@ -122,17 +124,16 @@ class BatchNorm(Layer):
         
         m = dA.shape[0]
         axis = tuple(range(dA.ndim-1))
-        X_mean, X_hat, var_sqrt = self._cache
         
-        self._dgamma = np.sum(dA * X_hat, axis=axis)
+        self._dgamma = np.sum(dA * self._X_hat, axis=axis)
         self._dbeta = np.sum(dA, axis=axis)
         
         dx_hat = dA * self._gamma
         
-        dvar = np.sum(dx_hat * X_mean, axis=axis) * -0.5 / var_sqrt**3
+        dvar = np.sum(dx_hat * self._X_mean, axis=axis) * -0.5 / self._var_sqrt**3
         dsq = (1 / m) * np.ones(dA.shape) * dvar
         
-        dx1 = (dx_hat / var_sqrt) + (2 * X_mean * dsq)
+        dx1 = (dx_hat / self._var_sqrt) + (2 * self._X_mean * dsq)
         dmean = -1 * np.sum(dx1, axis=axis)
         dx2 = (1 / m) * np.ones(dA.shape) * dmean
         dx = dx1 + dx2
@@ -141,21 +142,31 @@ class BatchNorm(Layer):
     
     
     def backward2(self, dA, **kwargs):
+        """
+        Performs backward propagation using upstream gradients.
+        
+        Args:
+            dA:
+                Gradients from previous (right) layer.
+                The expected shape is either (m, n) or (m, n_h, n_w, n_c).
+        
+        Returns:
+            Gradients reshaped as either (m, n) or (m, n_h, n_w, n_c).
+        """
         
         m = dA.shape[0]
         axis = tuple(range(dA.ndim-1))
-        X_mean, X_hat, var_sqrt = self._cache
         
-        self._dgamma = np.sum(dA * X_hat, axis=axis)
+        self._dgamma = np.sum(dA * self._X_hat, axis=axis)
         self._dbeta = np.sum(dA, axis=axis)
         
         dx_hat = dA * self._gamma
         
-        dvar = np.sum(dx_hat * X_mean, axis=axis) * -0.5 / var_sqrt**3
-        dmean = np.sum(dx_hat / -var_sqrt, axis=axis)
-        dmean += dvar * np.mean(-2. * X_mean, axis=axis)
+        dvar = np.sum(dx_hat * self._X_mean, axis=axis) * -0.5 / self._var_sqrt**3
+        dmean = np.sum(dx_hat / -self._var_sqrt, axis=axis)
+        dmean += dvar * np.mean(-2. * self._X_mean, axis=axis)
         
-        dX = (dx_hat / var_sqrt) + (2 * X_mean * dvar / m) + (dmean / m)
+        dX = (dx_hat / self._var_sqrt) + (2 * self._X_mean * dvar / m) + (dmean / m)
         
         return dX
     
@@ -167,25 +178,23 @@ class BatchNorm(Layer):
         Args:
             dA:
                 Gradients from previous (right) layer.
-                The expected shape is (m, ?).
+                The expected shape is either (m, n) or (m, n_h, n_w, n_c).
         
         Returns:
-            Gradients reshaped as (m, n_h, n_w, n_c).
+            Gradients reshaped as either (m, n) or (m, n_h, n_w, n_c).
         """
         
         m = dA.shape[0]
         axis = tuple(range(dA.ndim-1))
         
-        X_mean, X_hat, var_sqrt = self._cache
-        
-        self._dgamma = np.sum(dA * X_hat, axis=axis)
+        self._dgamma = np.sum(dA * self._X_hat, axis=axis)
         self._dbeta = np.sum(dA, axis=axis)
         
         dx_hat = dA * self._gamma
         dx = m * dx_hat
-        dx -= X_hat * np.sum(dx_hat * X_hat, axis=axis)
+        dx -= self._X_hat * np.sum(dx_hat * self._X_hat, axis=axis)
         dx -= np.sum(dx_hat, axis=axis)
-        dx /= var_sqrt
+        dx /= self._var_sqrt
         dx /= m
         
         return dx
