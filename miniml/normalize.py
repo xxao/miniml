@@ -129,68 +129,6 @@ class BatchNorm(Layer):
         self._dbeta = np.sum(dA, axis=axis)
         
         dx_hat = dA * self._gamma
-        
-        dvar = np.sum(dx_hat * self._X_mean, axis=axis) * -0.5 / self._var_sqrt**3
-        dsq = (1 / m) * np.ones(dA.shape) * dvar
-        
-        dx1 = (dx_hat / self._var_sqrt) + (2 * self._X_mean * dsq)
-        dmean = -1 * np.sum(dx1, axis=axis)
-        dx2 = (1 / m) * np.ones(dA.shape) * dmean
-        dx = dx1 + dx2
-        
-        return dx
-    
-    
-    def backward2(self, dA, **kwargs):
-        """
-        Performs backward propagation using upstream gradients.
-        
-        Args:
-            dA:
-                Gradients from previous (right) layer.
-                The expected shape is either (m, n) or (m, n_h, n_w, n_c).
-        
-        Returns:
-            Gradients reshaped as either (m, n) or (m, n_h, n_w, n_c).
-        """
-        
-        m = dA.shape[0]
-        axis = tuple(range(dA.ndim-1))
-        
-        self._dgamma = np.sum(dA * self._X_hat, axis=axis)
-        self._dbeta = np.sum(dA, axis=axis)
-        
-        dx_hat = dA * self._gamma
-        
-        dvar = np.sum(dx_hat * self._X_mean, axis=axis) * -0.5 / self._var_sqrt**3
-        dmean = np.sum(dx_hat / -self._var_sqrt, axis=axis)
-        dmean += dvar * np.mean(-2. * self._X_mean, axis=axis)
-        
-        dX = (dx_hat / self._var_sqrt) + (2 * self._X_mean * dvar / m) + (dmean / m)
-        
-        return dX
-    
-    
-    def backward3(self, dA, **kwargs):
-        """
-        Performs backward propagation using upstream gradients.
-        
-        Args:
-            dA:
-                Gradients from previous (right) layer.
-                The expected shape is either (m, n) or (m, n_h, n_w, n_c).
-        
-        Returns:
-            Gradients reshaped as either (m, n) or (m, n_h, n_w, n_c).
-        """
-        
-        m = dA.shape[0]
-        axis = tuple(range(dA.ndim-1))
-        
-        self._dgamma = np.sum(dA * self._X_hat, axis=axis)
-        self._dbeta = np.sum(dA, axis=axis)
-        
-        dx_hat = dA * self._gamma
         dx = m * dx_hat
         dx -= self._X_hat * np.sum(dx_hat * self._X_hat, axis=axis)
         dx -= np.sum(dx_hat, axis=axis)
